@@ -1,0 +1,115 @@
+.app-list-container {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.tester-header {
+  padding: 40px;
+  text-align: center;
+  margin-bottom: 30px;
+  color: var(--c-content);
+}
+
+.tester-header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+.apps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.app-item {
+  padding: 20px;
+  color: var(--c-content);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.app-item:hover {
+  transform: translateY(-2px);
+}
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.app-basic-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.app-icon {
+  font-size: 2rem;
+}
+
+.app-title h3 {
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.app-version {
+  opacity: 0.7;
+  font-size: 0.9rem;
+}
+
+.expand-icon {
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+.app-details {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid color-mix(in srgb, var(--c-content) 20%, transparent);
+}
+
+.detail-section {
+  margin-bottom: 20px;
+}
+
+.detail-section h4 {
+  margin: 0 0 10px 0;
+  font-size: 1.1rem;
+}
+
+.tech-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tech-tag {
+  background: color-mix(in srgb, var(--c-glass) 20%, transparent);
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  backdrop-filter: blur(5px);
+  border: 1px solid color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 5%), transparent);
+}
+
+.requirements p {
+  margin: 5px 0;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .app-list-container {
+    padding: 10px;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+}

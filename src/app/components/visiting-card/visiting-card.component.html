@@ -1,0 +1,35 @@
+<div class="visiting-card">
+  <header class="hero glass-effect">
+    <div class="hero-content">
+      <h1>{{ developerInfo.name }}</h1>
+      <h2>{{ developerInfo.position }}</h2>
+      <p class="subtitle">{{ developerInfo.bio }}</p>
+      <div class="stats">
+        <span class="stat">📱 {{ developerInfo.experience }}</span>
+        <span class="stat">📧 {{ developerInfo.email }}</span>
+      </div>
+    </div>
+  </header>
+
+  <section class="featured-apps">
+    <h2>Мои приложения</h2>
+    <div class="apps-grid">
+      <div class="app-card glass-effect" *ngFor="let app of featuredApps">
+        <div class="app-icon">{{ app.icon }}</div>
+        <h3>{{ app.name }}</h3>
+        <p>{{ app.description }}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <div class="cta-content glass-effect">
+      <h2>Хочешь стать тестировщиком?</h2>
+      <p>Присоединяйся к бета-тестированию моих приложений!</p>
+      <div class="cta-buttons">
+        <a routerLink="/auth" class="glass-button">Стать тестировщиком</a>
+        <a routerLink="/auth" class="glass-button secondary">Войти</a>
+      </div>
+    </div>
+  </section>
+</div>

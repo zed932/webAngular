@@ -1,0 +1,31 @@
+<div class="app-wrapper">
+  <!-- Общая навигация для всех страниц -->
+  <header class="main-header">
+    <nav class="header-nav glass-effect">
+      <a routerLink="/" class="nav-brand">iOS Portfolio</a>
+      <div class="nav-actions">
+        <a routerLink="/" class="nav-link">Главная</a>
+        <a routerLink="/tester" class="nav-link" *ngIf="authService.isAuthenticated()">Тестирование</a>
+        <span class="user-email" *ngIf="authService.isAuthenticated()">
+          {{ (authService.currentUser$ | async)?.email }}
+        </span>
+        <button
+          *ngIf="authService.isAuthenticated()"
+          (click)="authService.logout()"
+          class="glass-button small">
+          Выйти
+        </button>
+        <a
+          *ngIf="!authService.isAuthenticated()"
+          routerLink="/auth"
+          class="glass-button small">
+          Войти
+        </a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <router-outlet></router-outlet>
+  </main>
+</div>

@@ -1,0 +1,51 @@
+<div class="app-list-container">
+  <header class="tester-header glass-effect">
+    <h1>Панель тестировщика</h1>
+    <p>Добро пожаловать! Здесь вы можете ознакомиться с приложениями для тестирования.</p>
+  </header>
+
+  <div class="apps-list">
+    <div
+      *ngFor="let app of apps"
+      class="app-item glass-effect"
+      [class.expanded]="isExpanded(app.id)">
+
+      <div class="app-header" (click)="toggleAppDetails(app.id)">
+        <div class="app-basic-info">
+          <span class="app-icon">{{ app.icon }}</span>
+          <div class="app-title">
+            <h3>{{ app.name }}</h3>
+            <span class="app-version">v{{ app.version }}</span>
+          </div>
+        </div>
+        <div class="app-actions">
+          <span class="expand-icon">
+            {{ isExpanded(app.id) ? '▼' : '▶' }}
+          </span>
+        </div>
+      </div>
+
+      <div *ngIf="isExpanded(app.id)" class="app-details">
+        <div class="detail-section">
+          <h4>📱 Описание</h4>
+          <p>{{ app.description }}</p>
+        </div>
+
+        <div class="detail-section">
+          <h4>🛠 Технологии</h4>
+          <div class="tech-stack">
+            <span class="tech-tag" *ngFor="let tech of app.techStack">{{ tech }}</span>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h4>⚙️ Требования</h4>
+          <div class="requirements">
+            <p><strong>Минимальная версия iOS:</strong> {{ app.minIOSVersion }}</p>
+            <p><strong>Поддержка macOS:</strong> {{ app.supportsMacOS ? '✅ Да' : '❌ Нет' }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

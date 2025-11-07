@@ -1,0 +1,144 @@
+.visiting-card {
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.hero {
+  padding: 60px 40px;
+  text-align: center;
+  margin-bottom: 40px;
+  color: var(--c-content);
+}
+
+.hero h1 {
+  font-size: 3rem;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.hero h2 {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  opacity: 0.9;
+  font-weight: 400;
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  max-width: 600px;
+  margin: 0 auto 30px;
+  opacity: 0.8;
+}
+
+.stats {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+.stat {
+  background: color-mix(in srgb, var(--c-glass) 20%, transparent);
+  padding: 10px 20px;
+  border-radius: 25px;
+  backdrop-filter: blur(10px) saturate(var(--saturation));
+  border: 1px solid color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 10%), transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 30%), transparent),
+    0 4px 12px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 5%), transparent);
+}
+
+.featured-apps {
+  margin-bottom: 40px;
+}
+
+.featured-apps h2 {
+  text-align: center;
+  color: var(--c-content);
+  font-size: 2.5rem;
+  margin-bottom: 30px;
+}
+
+.apps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 25px;
+  margin-bottom: 40px;
+}
+
+.app-card {
+  padding: 30px;
+  text-align: center;
+  color: var(--c-content);
+  transition: all 0.3s ease;
+}
+
+.app-card:hover {
+  transform: translateY(-5px);
+}
+
+.app-icon {
+  font-size: 3rem;
+  margin-bottom: 15px;
+}
+
+.app-card h3 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+.app-card p {
+  opacity: 0.8;
+}
+
+.cta-section {
+  text-align: center;
+}
+
+.cta-content {
+  padding: 50px;
+  color: var(--c-content);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.cta-content h2 {
+  font-size: 2rem;
+  margin-bottom: 15px;
+}
+
+.cta-content p {
+  font-size: 1.1rem;
+  margin-bottom: 25px;
+  opacity: 0.9;
+}
+
+.cta-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.glass-button.secondary {
+  background: color-mix(in srgb, var(--c-glass) 10%, transparent);
+}
+
+@media (max-width: 768px) {
+  .hero {
+    padding: 40px 20px;
+  }
+
+  .hero h1 {
+    font-size: 2rem;
+  }
+
+  .apps-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cta-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+}
