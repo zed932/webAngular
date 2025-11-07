@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { App, AdminApp } from '../models/app.model';
-import { AdminStats } from '../models/app.model';
+import { App, AdminApp } from '../../shared/models/app.model';
+import { AdminStats } from '../../shared/models/app.model';
 
 @Injectable({
   providedIn: 'root'

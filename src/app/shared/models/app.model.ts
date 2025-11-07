@@ -11,7 +11,7 @@ export interface App {
 
 export interface User {
   email: string;
-  isTester: boolean;
+  role: 'guest' | 'tester' | 'admin';
 }
 
 export interface AdminApp extends App {

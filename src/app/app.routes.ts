@@ -1,24 +1,25 @@
 import { Routes } from '@angular/router';
-import { AuthGuard } from './guards/auth.guard';
+import { AuthGuard } from './core/guards/auth.guard';
+import { AdminGuard } from './core/guards/admin.guard';
 
 export const routes: Routes = [
   {
     path: '',
-    loadComponent: () => import('./components/visiting-card/visiting-card.component').then(c => c.VisitingCardComponent)
+    loadComponent: () => import('./features/home/visiting-card.component').then(c => c.VisitingCardComponent)
   },
   {
     path: 'auth',
-    loadComponent: () => import('./components/auth-form/auth-form.component').then(c => c.AuthFormComponent)
+    loadComponent: () => import('./features/auth/auth-form.component').then(c => c.AuthFormComponent)
   },
   {
     path: 'admin',
-    loadComponent: () => import('./components/admin-panel/admin-panel.component').then(c => c.AdminPanelComponent),
-    canActivate: [AuthGuard],
+    loadComponent: () => import('./features/admin/admin-panel.component').then(c => c.AdminPanelComponent),
+    canActivate: [AuthGuard, AdminGuard], // Оба guard'а
   },
   {
     path: 'tester',
-    loadComponent: () => import('./components/app-list/app-list.component').then(c => c.AppListComponent),
-    canActivate: [AuthGuard]
+    loadComponent: () => import('./features/apps/app-list.component').then(c => c.AppListComponent),
+    canActivate: [AuthGuard] // Только AuthGuard
   },
   { path: '**', redirectTo: '' }
 ];

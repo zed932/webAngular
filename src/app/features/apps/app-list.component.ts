@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AppService } from '../../services/app.service';
-import { App } from '../../models/app.model';
+import { Subject, takeUntil } from 'rxjs';
+import { AppService } from '../../core/services/app.service';
+import { App } from '../../shared/models/app.model';
 
 @Component({
   selector: 'app-app-list',
@@ -10,14 +11,18 @@ import { App } from '../../models/app.model';
   templateUrl: './app-list.component.html',
   styleUrls: ['./app-list.component.css']
 })
-export class AppListComponent implements OnInit {
+export class AppListComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
+
   apps: App[] = [];
   expandedAppId: number | null = null;
 
   constructor(private appService: AppService) {}
 
   ngOnInit() {
-    this.appService.getApps().subscribe(apps => {
+    this.appService.getApps().pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(apps => {
       this.apps = apps;
     });
   }
@@ -28,5 +33,10 @@ export class AppListComponent implements OnInit {
 
   isExpanded(appId: number): boolean {
     return this.expandedAppId === appId;
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }
