@@ -1,0 +1,146 @@
+[file name]: admin-panel.component.html
+[file content begin]
+<div class="admin-panel">
+  <div class="panel-header">
+    <h1>Панель управления приложениями</h1>
+    <button class="glass-button" (click)="startAddApp()" [disabled]="isEditing || isAdding">
+      + Добавить приложение
+    </button>
+  </div>
+
+  <!-- Статистика -->
+  <div class="stats-grid">
+    <div class="stat-card glass-effect">
+      <div class="stat-icon">📱</div>
+      <div class="stat-info">
+        <h3>{{ stats.totalApps }}</h3>
+        <p>Всего приложений</p>
+      </div>
+    </div>
+    <div class="stat-card glass-effect">
+      <div class="stat-icon">🚀</div>
+      <div class="stat-info">
+        <h3>{{ stats.publishedApps }}</h3>
+        <p>Опубликовано</p>
+      </div>
+    </div>
+    <div class="stat-card glass-effect">
+      <div class="stat-icon">⬇️</div>
+      <div class="stat-info">
+        <h3>{{ stats.totalDownloads }}</h3>
+        <p>Всего загрузок</p>
+      </div>
+    </div>
+    <div class="stat-card glass-effect">
+      <div class="stat-icon">⭐</div>
+      <div class="stat-info">
+        <h3>{{ stats.averageRating }}</h3>
+        <p>Средний рейтинг</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Форма добавления нового приложения -->
+  <div class="edit-form glass-effect" *ngIf="isAdding">
+    <h3>Добавить новое приложение</h3>
+    <div class="form-grid">
+      <input [(ngModel)]="newApp.name" placeholder="Название приложения" class="glass-input">
+      <input [(ngModel)]="newApp.version" placeholder="Версия" class="glass-input">
+      <input [(ngModel)]="newApp.minIOSVersion" placeholder="Минимальная версия iOS" class="glass-input">
+      <input [(ngModel)]="newApp.icon" placeholder="Иконка (эмодзи)" class="glass-input">
+      <textarea [(ngModel)]="newApp.description" placeholder="Описание" class="glass-input"></textarea>
+      <div class="checkbox-group">
+        <label>
+          <input type="checkbox" [(ngModel)]="newApp.supportsMacOS"> Поддержка macOS
+        </label>
+        <label>
+          <input type="checkbox" [(ngModel)]="newApp.isPublished"> Опубликовано
+        </label>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="glass-button" (click)="saveNewApp()">Сохранить</button>
+      <button class="glass-button secondary" (click)="cancelAdd()">Отмена</button>
+    </div>
+  </div>
+
+  <!-- Форма редактирования -->
+  <div class="edit-form glass-effect" *ngIf="isEditing && selectedApp">
+    <h3>Редактирование приложения</h3>
+    <div class="form-grid">
+      <input [(ngModel)]="selectedApp.name" placeholder="Название" class="glass-input">
+      <input [(ngModel)]="selectedApp.version" placeholder="Версия" class="glass-input">
+      <input [(ngModel)]="selectedApp.minIOSVersion" placeholder="Минимальная версия iOS" class="glass-input">
+      <input [(ngModel)]="selectedApp.icon" placeholder="Иконка" class="glass-input">
+      <textarea [(ngModel)]="selectedApp.description" placeholder="Описание" class="glass-input"></textarea>
+      <input [(ngModel)]="selectedApp.downloadCount" type="number" placeholder="Количество загрузок" class="glass-input">
+      <input [(ngModel)]="selectedApp.rating" type="number" step="0.1" min="0" max="5" placeholder="Рейтинг" class="glass-input">
+
+      <div class="tech-stack-section">
+        <label>Технологии:</label>
+        <div class="tech-stack-input">
+          <input [(ngModel)]="newTechStackItem" placeholder="Добавить технологию" class="glass-input"
+                 (keyup.enter)="addTechStackItem()">
+          <button class="glass-button small" (click)="addTechStackItem()">+</button>
+        </div>
+        <div class="tech-stack-list">
+          <span *ngFor="let tech of selectedApp.techStack; let i = index" class="tech-tag">
+            {{ tech }}
+            <button (click)="removeTechStackItem(i)" class="remove-tech">×</button>
+          </span>
+        </div>
+      </div>
+
+      <div class="checkbox-group">
+        <label>
+          <input type="checkbox" [(ngModel)]="selectedApp.supportsMacOS"> Поддержка macOS
+        </label>
+        <label>
+          <input type="checkbox" [(ngModel)]="selectedApp.isPublished"> Опубликовано
+        </label>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="glass-button" (click)="saveApp()">Сохранить</button>
+      <button class="glass-button secondary" (click)="cancelEdit()">Отмена</button>
+    </div>
+  </div>
+
+  <!-- Список приложений -->
+  <div class="apps-list">
+    <div *ngFor="let app of apps" class="app-card glass-effect">
+      <div class="app-header">
+        <div class="app-icon">{{ app.icon }}</div>
+        <div class="app-info">
+          <h3>{{ app.name }}</h3>
+          <p class="app-version">v{{ app.version }}</p>
+          <p class="app-description">{{ app.description }}</p>
+        </div>
+        <div class="app-status" [class.published]="app.isPublished">
+          {{ app.isPublished ? '🚀 Опубликовано' : '📝 Черновик' }}
+        </div>
+      </div>
+
+      <div class="app-details">
+        <div class="tech-stack">
+          <span *ngFor="let tech of app.techStack" class="tech-tag">{{ tech }}</span>
+        </div>
+        <div class="app-metrics">
+          <span>⬇️ {{ app.downloadCount }}</span>
+          <span>⭐ {{ app.rating }}</span>
+          <span>{{ app.minIOSVersion }}</span>
+          <span *ngIf="app.supportsMacOS">💻 macOS</span>
+        </div>
+      </div>
+
+      <div class="app-actions">
+        <button class="glass-button small" (click)="togglePublish(app)">
+          {{ app.isPublished ? 'Снять с публикации' : 'Опубликовать' }}
+        </button>
+        <button class="glass-button small" (click)="editApp(app)">Редактировать</button>
+        <button class="glass-button small danger" (click)="deleteApp(app.id)">Удалить</button>
+      </div>
+    </div>
+  </div>
+</div>
+[file content end]

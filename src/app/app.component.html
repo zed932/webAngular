@@ -6,6 +6,7 @@
       <div class="nav-actions">
         <a routerLink="/" class="nav-link">Главная</a>
         <a routerLink="/tester" class="nav-link" *ngIf="authService.isAuthenticated()">Тестирование</a>
+        <a routerLink="/admin" class="nav-link" *ngIf="authService.isAuthenticated()">Админ-панель</a>
         <span class="user-email" *ngIf="authService.isAuthenticated()">
           {{ (authService.currentUser$ | async)?.email }}
         </span>
