@@ -1,7 +1,10 @@
+/* app-list.component.css */
 .app-list-container {
   padding: 20px;
   max-width: 800px;
   margin: 0 auto;
+  box-sizing: border-box;
+  width: 100%; /* Гарантируем, что контейнер занимает всю доступную ширину */
 }
 
 .tester-header {
@@ -12,8 +15,17 @@
 }
 
 .tester-header h1 {
-  font-size: 2.5rem;
+  font-size: clamp(1.8rem, 4vw, 2.5rem); /* Адаптивный размер шрифта */
   margin-bottom: 10px;
+  line-height: 1.2;
+}
+
+.tester-header p {
+  font-size: clamp(0.95rem, 2vw, 1.1rem); /* Адаптивный размер шрифта */
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.5;
+  opacity: 0.9;
 }
 
 .apps-list {
@@ -43,15 +55,25 @@
   display: flex;
   align-items: center;
   gap: 15px;
+  flex: 1; /* Занимает доступное пространство */
+  min-width: 0; /* Позволяет дочерним элементам сжиматься */
 }
 
 .app-icon {
   font-size: 2rem;
+  flex-shrink: 0; /* Предотвращаем сжатие иконки */
+}
+
+.app-title {
+  min-width: 0; /* Разрешаем сжатие текстового блока */
 }
 
 .app-title h3 {
   margin: 0;
   font-size: 1.3rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; /* Обрезаем длинные названия */
 }
 
 .app-version {
@@ -62,6 +84,8 @@
 .expand-icon {
   font-size: 0.8rem;
   opacity: 0.7;
+  flex-shrink: 0; /* Предотвращаем сжатие иконки раскрытия */
+  margin-left: 10px; /* Добавляем отступ для тач-устройств */
 }
 
 .app-details {
@@ -104,9 +128,9 @@
   flex-wrap: wrap;
 }
 
-/* Адаптив для списка приложений тестировщика */
+/* ===== ДОПОЛНИТЕЛЬНЫЕ МЕДИА-ЗАПРОСЫ ДЛЯ ПОЛНОЙ АДАПТИВНОСТИ ===== */
 
-/* Для очень маленьких экранов (340px - 480px) */
+/* Очень маленькие экраны (до 400px) - улучшаем существующий запрос */
 @media (max-width: 480px) {
   .app-list-container {
     padding: 12px;
@@ -139,19 +163,18 @@
   }
 
   .app-header {
-    flex-direction: column;
-    align-items: flex-start;
+    flex-direction: row; /* Оставляем row для лучшего использования пространства */
+    align-items: center;
     gap: 10px;
   }
 
   .app-basic-info {
-    width: 100%;
-    justify-content: space-between;
+    flex-direction: row; /* Оставляем row */
+    justify-content: flex-start;
   }
 
   .app-icon {
     font-size: 1.5rem;
-    flex-shrink: 0;
   }
 
   .app-title {
@@ -171,7 +194,7 @@
   }
 
   .expand-icon {
-    align-self: flex-end;
+    align-self: center; /* Центрируем по вертикали */
     font-size: 0.9rem;
   }
 
@@ -209,7 +232,7 @@
   }
 }
 
-/* Для экстремально маленьких экранов (340px и меньше) */
+/* Экстремально маленькие экраны (до 340px) */
 @media (max-width: 340px) {
   .tester-header {
     padding: 20px 16px;
@@ -217,6 +240,10 @@
 
   .tester-header h1 {
     font-size: 1.3rem;
+  }
+
+  .tester-header p {
+    font-size: 0.85rem;
   }
 
   .app-item {
@@ -232,31 +259,117 @@
   }
 }
 
-/* Для планшетов (481px - 768px) */
-@media (min-width: 481px) and (max-width: 768px) {
+/* Планшеты и небольшие ноутбуки (481px - 1023px) */
+@media (min-width: 481px) and (max-width: 1023px) {
   .app-list-container {
-    padding: 16px;
+    padding: 25px;
     max-width: 90%;
   }
 
   .tester-header {
-    padding: 30px 25px;
+    padding: 40px 35px;
   }
 
   .tester-header h1 {
-    font-size: 2rem;
+    font-size: 2.2rem;
+  }
+
+  .tester-header p {
+    font-size: 1.1rem;
+  }
+
+  .apps-list {
+    gap: 18px;
   }
 
   .app-item {
-    padding: 20px;
+    padding: 25px;
   }
 
   .app-title h3 {
-    font-size: 1.2rem;
+    font-size: 1.4rem;
+  }
+
+  .app-icon {
+    font-size: 2.2rem;
   }
 }
 
-/* Для ландшафтной ориентации на мобильных */
+/* Большие экраны (1024px - 1399px) */
+@media (min-width: 1024px) and (max-width: 1399px) {
+  .app-list-container {
+    max-width: 850px;
+    padding: 30px;
+  }
+
+  .tester-header {
+    padding: 50px 40px;
+  }
+
+  .tester-header h1 {
+    font-size: 2.8rem;
+  }
+
+  .tester-header p {
+    font-size: 1.2rem;
+    max-width: 700px;
+  }
+
+  .apps-list {
+    gap: 20px;
+  }
+
+  .app-item {
+    padding: 30px;
+  }
+
+  .app-title h3 {
+    font-size: 1.5rem;
+  }
+
+  .app-icon {
+    font-size: 2.5rem;
+  }
+}
+
+/* Очень большие экраны (1400px и выше) */
+@media (min-width: 1400px) {
+  .app-list-container {
+    max-width: 900px;
+    padding: 40px;
+  }
+
+  .tester-header {
+    padding: 60px 50px;
+  }
+
+  .tester-header h1 {
+    font-size: 3rem;
+  }
+
+  .tester-header p {
+    font-size: 1.3rem;
+    max-width: 750px;
+  }
+
+  .apps-list {
+    gap: 25px;
+  }
+
+  .app-item {
+    padding: 35px;
+  }
+
+  .app-title h3 {
+    font-size: 1.6rem;
+  }
+
+  .app-icon {
+    font-size: 2.8rem;
+  }
+}
+
+/* Ландшафтная ориентация на мобильных */
 @media (max-height: 600px) and (orientation: landscape) {
   .app-list-container {
     padding: 8px;
@@ -278,18 +391,36 @@
   }
 }
 
-/* Touch-устройства */
+/* Touch-устройства - улучшаем доступность */
 @media (hover: none) and (pointer: coarse) {
   .app-item:hover {
     transform: none;
   }
 
   .app-header {
-    min-height: 44px;
+    min-height: 44px; /* Минимальная высота для удобного тапа */
   }
 
   .tech-tag {
     min-height: 32px;
     min-width: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .expand-icon {
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* Для десктопов с мышью - восстанавливаем hover-эффекты */
+@media (hover: hover) {
+  .app-item:hover {
+    transform: translateY(-2px);
   }
 }

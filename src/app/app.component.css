@@ -1,133 +1,118 @@
 .app-wrapper {
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .main-header {
   position: sticky;
   top: 0;
   z-index: 100;
-  padding: 15px 20px;
+  padding: 10px 12px; /* Начинаем с мобильных отступов */
+  background: color-mix(in srgb, var(--c-bg) 95%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .header-nav {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column; /* Вертикальное расположение на мобильных */
+  justify-content: center;
   align-items: center;
-  padding: 15px 30px;
-  max-width: 1200px;
+  padding: 12px 16px;
+  width: 100%;
+  box-sizing: border-box;
+  gap: 12px;
+  max-width: 100%;
   margin: 0 auto;
 }
 
 .nav-brand {
-  font-size: 1.4rem;
+  font-size: 1.1rem; /* Начинаем с мобильного размера */
   font-weight: 700;
   color: var(--c-content);
   text-decoration: none;
   letter-spacing: -0.5px;
+  text-align: center;
+  width: 100%;
+  order: 1; /* Позиция на мобильных */
 }
 
 .nav-actions {
   display: flex;
+  flex-direction: column; /* Вертикально на мобильных */
   align-items: center;
-  gap: 20px;
+  gap: 10px;
+  width: 100%;
+  order: 2;
+}
+
+.nav-links-group {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
 }
 
 .nav-link {
   color: var(--c-content);
   text-decoration: none;
   font-weight: 500;
-  font-size: 0.9rem;
+  font-size: 0.85rem; /* Начинаем с мобильного размера */
   opacity: 0.8;
   transition: opacity 0.3s ease;
+  padding: 8px 12px;
+  border-radius: 8px;
+  text-align: center;
+  min-height: 36px; /* Минимальная высота для тач-устройств */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-width: 80px; /* Минимальная ширина */
+  max-width: 120px; /* Максимальная ширина */
 }
 
 .nav-link:hover {
   opacity: 1;
+  background: color-mix(in srgb, var(--c-glass) 20%, transparent);
 }
 
 .user-email {
   color: var(--c-content);
-  font-size: 0.85rem;
+  font-size: 0.8rem; /* Начинаем с мобильного размера */
   opacity: 0.7;
   font-weight: 500;
+  text-align: center;
+  width: 100%;
+  padding: 6px 0;
+  order: -1; /* Вверху на мобильных */
 }
 
 .glass-button.small {
-  padding: 10px 20px;
+  padding: 10px 16px;
   font-size: 0.85rem;
+  min-height: 40px;
+  min-width: 80px;
+  text-align: center;
 }
 
-/* Адаптив для хедера */
-
-/* Для очень маленьких экранов (340px - 480px) */
-@media (max-width: 480px) {
-  .app-wrapper {
-    min-height: 100vh;
-  }
-
-  .main-header {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    padding: 10px 12px;
-  }
-
-  .header-nav {
-    padding: 10px 15px;
-    flex-direction: column;
-    gap: 12px;
-    border-radius: 16px;
-  }
-
-  .nav-brand {
-    font-size: 1.1rem;
-    text-align: center;
-    width: 100%;
-  }
-
-  .nav-actions {
-    width: 100%;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-
-  .nav-link {
-    font-size: 0.8rem;
-    padding: 5px 8px;
-  }
-
-  .user-email {
-    font-size: 0.75rem;
-    text-align: center;
-    width: 100%;
-    order: -1;
-    margin-bottom: 5px;
-  }
-
-  .glass-button.small {
-    padding: 8px 12px;
-    font-size: 0.75rem;
-    min-height: 36px;
-  }
-
-  /* Группировка навигационных ссылок */
-  .nav-links-group {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
+main {
+  flex: 1;
+  width: 100%;
+  overflow-x: hidden; /* Предотвращаем горизонтальную прокрутку */
 }
 
-/* Для экстремально маленьких экранов (340px и меньше) */
+/* Для очень маленьких экранов (до 340px) */
 @media (max-width: 340px) {
   .main-header {
     padding: 8px 10px;
   }
 
   .header-nav {
-    padding: 8px 12px;
+    padding: 10px 12px;
+    gap: 10px;
   }
 
   .nav-brand {
@@ -136,75 +121,339 @@
 
   .nav-link {
     font-size: 0.75rem;
-    padding: 4px 6px;
+    padding: 6px 10px;
+    min-height: 32px;
+    min-width: 70px;
   }
 
-  .nav-actions {
-    gap: 6px;
+  .user-email {
+    font-size: 0.7rem;
   }
 
   .glass-button.small {
-    padding: 6px 10px;
-    font-size: 0.7rem;
+    padding: 8px 12px;
+    font-size: 0.75rem;
+    min-height: 36px;
+  }
+
+  .nav-links-group {
+    gap: 6px;
   }
 }
 
-/* Для планшетов (481px - 768px) */
-@media (min-width: 481px) and (max-width: 768px) {
+/* Планшеты и большие телефоны (481px и выше) */
+@media (min-width: 481px) {
   .main-header {
     padding: 12px 16px;
   }
 
   .header-nav {
+    flex-direction: row; /* Горизонтальное расположение на планшетах */
+    justify-content: space-between;
+    gap: 16px;
     padding: 12px 20px;
+    max-width: 100%;
   }
 
   .nav-brand {
     font-size: 1.2rem;
+    width: auto;
+    text-align: left;
+    order: 1;
+    flex-shrink: 0;
   }
 
   .nav-actions {
+    flex-direction: row; /* Горизонтальное расположение на планшетах */
+    justify-content: flex-end;
+    width: auto;
+    order: 2;
     gap: 15px;
+  }
+
+  .nav-links-group {
+    width: auto;
+    justify-content: flex-end;
+    gap: 12px;
   }
 
   .nav-link {
     font-size: 0.85rem;
+    padding: 8px 16px;
+    min-height: 40px;
+    min-width: 90px;
+    max-width: none;
+    flex: none;
+  }
+
+  .user-email {
+    font-size: 0.8rem;
+    width: auto;
+    padding: 0;
+    order: 0;
+    margin: 0;
+  }
+
+  .glass-button.small {
+    padding: 10px 20px;
+    font-size: 0.85rem;
+    min-height: 40px;
+  }
+}
+
+/* Планшеты в альбомной ориентации (769px и выше) */
+@media (min-width: 769px) {
+  .main-header {
+    padding: 15px 20px;
+  }
+
+  .header-nav {
+    padding: 15px 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .nav-brand {
+    font-size: 1.4rem;
+  }
+
+  .nav-actions {
+    gap: 20px;
+  }
+
+  .nav-link {
+    font-size: 0.9rem;
+    padding: 10px 20px;
+    min-height: 44px; /* Accessibility стандарт */
+  }
+
+  .user-email {
+    font-size: 0.85rem;
+  }
+
+  .glass-button.small {
+    padding: 10px 24px;
+    font-size: 0.9rem;
+    min-height: 44px;
+  }
+}
+
+/* Десктопы (1025px и выше) */
+@media (min-width: 1025px) {
+  .header-nav {
+    max-width: 1400px;
+    padding: 15px 40px;
+  }
+
+  .nav-brand {
+    font-size: 1.5rem;
+  }
+
+  .nav-link {
+    font-size: 0.95rem;
+  }
+
+  .user-email {
+    font-size: 0.9rem;
+  }
+}
+
+/* Большие экраны (1401px и выше) */
+@media (min-width: 1401px) {
+  .header-nav {
+    max-width: 1600px;
+    padding: 20px 50px;
+  }
+
+  .nav-brand {
+    font-size: 1.6rem;
+  }
+
+  .nav-link {
+    font-size: 1rem;
+    padding: 12px 24px;
+  }
+
+  .glass-button.small {
+    padding: 12px 28px;
+    font-size: 1rem;
   }
 }
 
 /* Для ландшафтной ориентации на мобильных */
 @media (max-height: 600px) and (orientation: landscape) {
   .main-header {
-    padding: 8px 10px;
+    padding: 8px 12px;
+    position: static; /* Убираем sticky для экономии места */
   }
 
   .header-nav {
     flex-direction: row;
     padding: 10px 15px;
+    gap: 10px;
   }
 
   .nav-brand {
     flex: 1;
+    font-size: 1rem;
+    text-align: left;
   }
 
   .nav-actions {
     flex: 2;
+    flex-direction: row;
     justify-content: flex-end;
+  }
+
+  .nav-links-group {
+    justify-content: flex-end;
+  }
+
+  .nav-link {
+    padding: 6px 10px;
+    min-height: 32px;
+    font-size: 0.8rem;
+  }
+
+  .user-email {
+    display: none; /* Скрываем email для экономии места */
   }
 }
 
-/* Touch-устройства */
+/* Touch-устройства (улучшения для сенсорных экранов) */
 @media (hover: none) and (pointer: coarse) {
   .nav-link {
     min-height: 44px;
     min-width: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    touch-action: manipulation;
+  }
+
+  .nav-link:active {
+    opacity: 1;
+    background: color-mix(in srgb, var(--c-action) 20%, transparent);
+    transform: scale(0.95);
   }
 
   .glass-button.small {
     min-height: 44px;
     min-width: 44px;
+    touch-action: manipulation;
+  }
+
+  .glass-button.small:active {
+    transform: scale(0.95);
+  }
+}
+
+/* Поддержка prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .nav-link,
+  .glass-button.small {
+    transition: none;
+  }
+
+  .nav-link:hover,
+  .glass-button.small:hover,
+  .nav-link:active,
+  .glass-button.small:active {
+    transform: none;
+  }
+}
+
+/* Для темной темы */
+@media (prefers-color-scheme: dark) {
+  .main-header {
+    background: color-mix(in srgb, var(--c-bg) 90%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, var(--c-light) 10%, transparent);
+  }
+
+  .nav-link:hover {
+    background: color-mix(in srgb, var(--c-glass) 30%, transparent);
+  }
+}
+
+/* Для режима высокой контрастности */
+@media (prefers-contrast: high) {
+  .main-header {
+    background: var(--c-bg);
+    border-bottom: 2px solid #000;
+  }
+
+  .nav-brand {
+    color: #000;
+    font-weight: 900;
+  }
+
+  .nav-link {
+    color: #000;
+    border: 1px solid #000;
+    opacity: 1;
+    font-weight: 700;
+  }
+
+  .nav-link:hover {
+    background: #000;
+    color: #fff;
+  }
+
+  .user-email {
+    color: #000;
+    opacity: 1;
+    font-weight: 700;
+  }
+
+  .glass-button.small {
+    border: 2px solid #000;
+    color: #000;
+    font-weight: 700;
+  }
+
+  .glass-button.small:hover {
+    background: #000;
+    color: #fff;
+  }
+}
+
+/* Специальные стили для очень широких экранов */
+@media (min-width: 1920px) {
+  .header-nav {
+    max-width: 1800px;
+    padding: 25px 60px;
+  }
+
+  .nav-brand {
+    font-size: 1.8rem;
+  }
+
+  .nav-link {
+    font-size: 1.1rem;
+    padding: 14px 28px;
+  }
+
+  .glass-button.small {
+    padding: 14px 32px;
+    font-size: 1.1rem;
+  }
+}
+
+/* Улучшения для старых браузеров (fallback) */
+@supports not (backdrop-filter: blur(10px)) {
+  .main-header {
+    background: var(--c-bg);
+  }
+}
+
+/* Исправление для IE11 (если требуется) */
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+  .app-wrapper {
+    display: block;
+  }
+
+  .header-nav {
+    display: block;
+  }
+
+  .nav-actions {
+    display: inline-block;
   }
 }

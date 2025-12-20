@@ -10,27 +10,30 @@
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  padding: 20px;
+  padding: 16px;
+  box-sizing: border-box; /* Учитываем padding в размерах */
 }
 
 .publish-progress-container {
   width: 100%;
-  max-width: 400px;
-  padding: 25px;
+  max-width: 340px; /* Начинаем с мобильной ширины */
+  padding: 20px;
+  box-sizing: border-box; /* Учитываем padding в ширине */
 }
 
 .progress-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
+  margin-bottom: 12px;
 }
 
 .progress-header h4 {
   margin: 0;
-  font-size: 1.2rem;
+  font-size: 1.1rem; /* Начинаем с мобильного размера */
   font-weight: 600;
   color: var(--c-content);
+  line-height: 1.2;
 }
 
 .close-btn {
@@ -40,13 +43,16 @@
   color: var(--c-content);
   opacity: 0.7;
   cursor: pointer;
-  width: 30px;
-  height: 30px;
+  width: 32px; /* Увеличиваем для тач-устройств */
+  height: 32px;
+  min-width: 44px; /* Для accessibility */
+  min-height: 44px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
+  flex-shrink: 0; /* Предотвращаем сжатие */
 }
 
 .close-btn:hover {
@@ -55,22 +61,23 @@
 }
 
 .progress-message {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   color: color-mix(in srgb, var(--c-content) 80%, transparent);
-  font-size: 0.95rem;
+  font-size: 0.9rem; /* Начинаем с мобильного размера */
   line-height: 1.4;
 }
 
 .progress-bar-container {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   position: relative;
 }
 
 .progress-bar {
-  height: 8px;
+  height: 6px; /* Тоньше для мобильных */
   background: color-mix(in srgb, var(--c-glass) 50%, transparent);
-  border-radius: 4px;
+  border-radius: 3px;
   overflow: hidden;
+  width: 100%; /* Исправляем ширину */
 }
 
 .progress-fill {
@@ -80,10 +87,11 @@
     var(--c-action) 0%,
     #34C759 100%
   );
-  border-radius: 4px;
+  border-radius: 3px;
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
+  width: 0%; /* Начинаем с 0 */
 }
 
 .progress-fill::after {
@@ -105,8 +113,8 @@
 .progress-text {
   position: absolute;
   right: 0;
-  top: -25px;
-  font-size: 0.9rem;
+  top: -22px; /* Корректируем позицию */
+  font-size: 0.85rem; /* Начинаем с мобильного размера */
   font-weight: 600;
   color: var(--c-action);
 }
@@ -114,8 +122,8 @@
 .progress-status-icon {
   display: flex;
   justify-content: center;
-  font-size: 2rem;
-  margin-top: 10px;
+  font-size: 1.5rem; /* Начинаем с мобильного размера */
+  margin-top: 8px;
 }
 
 .progress-status-icon .success {
@@ -167,48 +175,72 @@
   }
 }
 
-/* Адаптив для прогресс-бара */
-@media (max-width: 480px) {
-  .publish-progress-overlay {
-    padding: 15px;
-  }
-
+/* Планшеты и большие телефоны (481px и выше) */
+@media (min-width: 481px) {
   .publish-progress-container {
-    padding: 20px;
-    border-radius: 16px;
+    max-width: 400px;
+    padding: 25px;
   }
 
   .progress-header h4 {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
   }
 
   .progress-message {
-    font-size: 0.9rem;
-    margin-bottom: 15px;
+    font-size: 0.95rem;
+    margin-bottom: 20px;
   }
 
   .progress-bar {
-    height: 6px;
+    height: 8px;
+    border-radius: 4px;
+  }
+
+  .progress-fill {
+    border-radius: 4px;
   }
 
   .progress-text {
-    font-size: 0.85rem;
-    top: -20px;
+    font-size: 0.9rem;
+    top: -25px;
   }
 
   .progress-status-icon {
-    font-size: 1.5rem;
+    font-size: 2rem;
+    margin-top: 10px;
   }
 
   .close-btn {
-    width: 28px;
-    height: 28px;
-    font-size: 1.3rem;
+    width: 30px;
+    height: 30px;
+    font-size: 1.5rem;
   }
 }
 
-@media (max-width: 340px) {
+/* Планшеты в альбомной ориентации (769px и выше) */
+@media (min-width: 769px) {
   .publish-progress-container {
+    max-width: 450px;
+    padding: 30px;
+  }
+
+  .progress-header h4 {
+    font-size: 1.3rem;
+  }
+
+  .progress-message {
+    font-size: 1rem;
+  }
+}
+
+/* Для очень маленьких экранов (до 340px) */
+@media (max-width: 340px) {
+  .publish-progress-overlay {
+    padding: 12px;
+  }
+
+  .publish-progress-container {
+    max-width: 280px;
     padding: 16px;
   }
 
@@ -218,13 +250,31 @@
 
   .progress-message {
     font-size: 0.85rem;
+    margin-bottom: 12px;
+  }
+
+  .progress-text {
+    font-size: 0.8rem;
+    top: -20px;
+  }
+
+  .progress-status-icon {
+    font-size: 1.3rem;
+  }
+
+  .close-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 1.3rem;
   }
 }
 
-/* Для ландшафтной ориентации */
+/* Для ландшафтной ориентации на мобильных */
 @media (max-height: 600px) and (orientation: landscape) {
   .publish-progress-overlay {
     padding: 10px;
+    align-items: flex-start; /* Выравниваем по верху */
+    padding-top: 20px;
   }
 
   .publish-progress-container {
@@ -241,6 +291,13 @@
   }
 }
 
+/* Для высоких экранов (высота больше 800px) */
+@media (min-height: 800px) {
+  .publish-progress-overlay {
+    align-items: center;
+  }
+}
+
 /* Поддержка prefers-reduced-motion */
 @media (prefers-reduced-motion: reduce) {
   .progress-fill {
@@ -252,12 +309,78 @@
   .progress-status-icon .error {
     animation: none;
   }
+
+  .progress-fill::after {
+    display: none; /* Убираем shimmer анимацию */
+  }
 }
 
-/* Touch-устройства */
+/* Touch-устройства (улучшения для сенсорных экранов) */
 @media (hover: none) and (pointer: coarse) {
   .close-btn {
     min-width: 44px;
     min-height: 44px;
+    font-size: 1.8rem; /* Увеличиваем для лучшей видимости */
   }
+
+  .close-btn:active {
+    opacity: 1;
+    background: color-mix(in srgb, var(--c-content) 20%, transparent);
+    transform: scale(0.95);
+  }
+
+  .publish-progress-container {
+    touch-action: manipulation; /* Улучшаем отзывчивость */
+  }
+}
+
+/* Для темной темы */
+@media (prefers-color-scheme: dark) {
+  .publish-progress-overlay {
+    background: rgba(0, 0, 0, 0.7); /* Более темный фон в темной теме */
+  }
+
+  .progress-fill::after {
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.2), /* Меньшая прозрачность в темной теме */
+      transparent
+    );
+  }
+}
+
+/* Для режима высокой контрастности */
+@media (prefers-contrast: high) {
+  .publish-progress-overlay {
+    background: rgba(0, 0, 0, 0.9); /* Высокая контрастность */
+  }
+
+  .progress-header h4 {
+    color: #000; /* Темный текст для контраста */
+  }
+
+  .progress-bar {
+    background: #ccc; /* Светлый фон для контраста */
+    border: 1px solid #000;
+  }
+
+  .progress-fill {
+    background: #0066cc; /* Яркий цвет для контраста */
+    border: 1px solid #000;
+  }
+
+  .progress-text {
+    color: #0066cc;
+    font-weight: 700;
+  }
+}
+
+/* Исправляем проблему с шириной прогресс-бара */
+.progress-bar[style*="width"] {
+  width: 100% !important; /* Принудительно устанавливаем ширину 100% */
+}
+
+.progress-fill[style*="width"] {
+  width: var(--progress-width, 0%) !important; /* Используем CSS переменную */
 }
