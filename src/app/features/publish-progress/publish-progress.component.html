@@ -1,0 +1,24 @@
+<div class="publish-progress-overlay" *ngIf="status">
+  <div class="publish-progress-container glass-effect">
+    <div class="progress-header">
+      <h4>{{ getStatusTitle() }}</h4>
+      <button *ngIf="status.status === 'success' || status.status === 'error'"
+              class="close-btn" (click)="onClose.emit()">×</button>
+    </div>
+
+    <div class="progress-message">{{ status.message || '' }}</div>
+
+    <div class="progress-bar-container">
+      <div class="progress-bar" [style.width.%]="status.progress || 0">
+        <div class="progress-fill"></div>
+      </div>
+      <span class="progress-text">{{ status.progress || 0 }}%</span>
+    </div>
+
+    <div class="progress-status-icon">
+      <span *ngIf="status.status === 'publishing'">⏳</span>
+      <span *ngIf="status.status === 'success'" class="success">✅</span>
+      <span *ngIf="status.status === 'error'" class="error">❌</span>
+    </div>
+  </div>
+</div>

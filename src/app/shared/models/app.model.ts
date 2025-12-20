@@ -1,5 +1,6 @@
 export interface App {
-  id: number;
+  _id: string;
+  id?: string;
   name: string;
   version: string;
   techStack: string[];
@@ -7,6 +8,8 @@ export interface App {
   supportsMacOS: boolean;
   description: string;
   icon: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface User {
@@ -18,6 +21,10 @@ export interface AdminApp extends App {
   isPublished: boolean;
   downloadCount: number;
   rating: number;
+  createdBy?: {
+    _id: string;
+    email: string;
+  };
 }
 
 export interface AdminStats {
@@ -27,4 +34,11 @@ export interface AdminStats {
   activeTesters: number;
   totalDownloads: number;
   averageRating: number;
+}
+
+export interface PublishStatus {
+  appId: string;
+  status: 'idle' | 'publishing' | 'success' | 'error';
+  progress: number;
+  message?: string;
 }

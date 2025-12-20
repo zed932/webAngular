@@ -1,110 +1,133 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { App, AdminApp } from '../../shared/models/app.model';
-import { AdminStats } from '../../shared/models/app.model';
+import { Observable, BehaviorSubject } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { App, AdminApp, AdminStats, PublishStatus } from '../../shared/models/app.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AppService {
-  private fakeApps: AdminApp[] = [
-    {
-      id: 1,
-      name: 'Finance Tracker',
-      version: '2.1.0',
-      techStack: ['SwiftUI', 'Combine', 'Core Data', 'Charts'],
-      minIOSVersion: 'iOS 15.0',
-      supportsMacOS: true,
-      description: 'Приложение для учета личных финансов с аналитикой и бюджетированием.',
-      icon: '💰',
-      isPublished: true,
-      downloadCount: 1542,
-      rating: 4.8
-    },
-    {
-      id: 2,
-      name: 'Meditation Guide',
-      version: '1.4.2',
-      techStack: ['UIKit', 'AVFoundation', 'UserNotifications'],
-      minIOSVersion: 'iOS 14.0',
-      supportsMacOS: false,
-      description: 'Гид по медитациям с таймером и отслеживанием прогресса.',
-      icon: '🧘',
-      isPublished: false,
-      downloadCount: 892,
-      rating: 4.5
-    },
-    {
-      id: 3,
-      name: 'Recipe Organizer',
-      version: '3.0.1',
-      techStack: ['SwiftUI', 'CloudKit', 'Camera API'],
-      minIOSVersion: 'iOS 16.0',
-      supportsMacOS: true,
-      description: 'Организатор рецептов с синхронизацией между устройствами.',
-      icon: '👨‍🍳',
-      isPublished: true,
-      downloadCount: 2107,
-      rating: 4.9
-    }
-  ];
+  private apiUrl = 'http://localhost:3000/api';
+  private publishStatusSubject = new BehaviorSubject<PublishStatus[]>([]);
+  publishStatus$ = this.publishStatusSubject.asObservable();
+
+  constructor(private http: HttpClient) {}
+
+  getApps(): Observable<App[]> {
+    return this.http.get<App[]>(`${this.apiUrl}/apps`);
+  }
+
+  getAppById(id: string): Observable<App> {
+    return this.http.get<App>(`${this.apiUrl}/apps/${id}`);
+  }
 
   getAdminApps(): Observable<AdminApp[]> {
-    return of(this.fakeApps);
+    return this.http.get<AdminApp[]>(`${this.apiUrl}/admin/apps`);
   }
 
-  toggleAppPublish(appId: number): Observable<AdminApp | undefined> {
-    const app = this.fakeApps.find(a => a.id === appId);
-    if (app) {
-      app.isPublished = !app.isPublished;
-    }
-    return of(app);
+  toggleAppPublish(appId: string): Observable<AdminApp> {
+    this.startPublishing(appId);
+
+    return new Observable<AdminApp>(observer => {
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += 10;
+        this.updatePublishProgress(appId, progress);
+
+        if (progress >= 100) {
+          clearInterval(interval);
+          this.http.patch<AdminApp>(`${this.apiUrl}/admin/apps/${appId}/publish`, {})
+            .subscribe({
+              next: (app) => {
+                this.completePublishing(appId, 'success', 'Приложение успешно опубликовано!');
+                observer.next(app);
+                observer.complete();
+              },
+              error: (error) => {
+                this.completePublishing(appId, 'error', 'Ошибка при публикации');
+                observer.error(error);
+              }
+            });
+        }
+      }, 200);
+    });
   }
 
-  updateApp(appId: number, updates: Partial<AdminApp>): Observable<AdminApp> {
-    const index = this.fakeApps.findIndex(a => a.id === appId);
-    if (index !== -1) {
-      this.fakeApps[index] = { ...this.fakeApps[index], ...updates };
-      return of(this.fakeApps[index]);
-    }
-    throw new Error('App not found');
+  updateApp(appId: string, updates: Partial<AdminApp>): Observable<AdminApp> {
+    return this.http.put<AdminApp>(`${this.apiUrl}/admin/apps/${appId}`, updates);
   }
 
-  addApp(newApp: Omit<AdminApp, 'id'>): Observable<AdminApp> {
-    const app: AdminApp = {
-      ...newApp,
-      id: Math.max(...this.fakeApps.map(a => a.id)) + 1
-    };
-    this.fakeApps.push(app);
-    return of(app);
+  addApp(newApp: Omit<AdminApp, '_id'>): Observable<AdminApp> {
+    return this.http.post<AdminApp>(`${this.apiUrl}/admin/apps`, newApp);
   }
 
-  deleteApp(appId: number): Observable<boolean> {
-    const index = this.fakeApps.findIndex(a => a.id === appId);
-    if (index !== -1) {
-      this.fakeApps.splice(index, 1);
-      return of(true);
-    }
-    return of(false);
+  deleteApp(appId: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/admin/apps/${appId}`);
   }
 
   getAdminStats(): Observable<AdminStats> {
-    const stats: AdminStats = {
-      totalApps: this.fakeApps.length,
-      publishedApps: this.fakeApps.filter(app => app.isPublished).length,
-      totalTesters: 3,
-      activeTesters: 2,
-      totalDownloads: this.fakeApps.reduce((sum, app) => sum + app.downloadCount, 0),
-      averageRating: Number((this.fakeApps.reduce((sum, app) => sum + app.rating, 0) / this.fakeApps.length).toFixed(1))
-    };
-    return of(stats);
+    return this.http.get<AdminStats>(`${this.apiUrl}/admin/stats`);
   }
 
-  getApps(): Observable<App[]> {
-    return of(this.fakeApps.filter(app => app.isPublished));
+  private startPublishing(appId: string): void {
+    const currentStatus = this.publishStatusSubject.value;
+    const existingIndex = currentStatus.findIndex(s => s.appId === appId);
+
+    if (existingIndex >= 0) {
+      currentStatus[existingIndex] = {
+        appId,
+        status: 'publishing',
+        progress: 0,
+        message: 'Начало публикации...'
+      };
+    } else {
+      currentStatus.push({
+        appId,
+        status: 'publishing',
+        progress: 0,
+        message: 'Начало публикации...'
+      });
+    }
+
+    this.publishStatusSubject.next([...currentStatus]);
   }
 
-  getAppById(id: number): Observable<App | undefined> {
-    return of(this.fakeApps.find(app => app.id === id && app.isPublished));
+  private updatePublishProgress(appId: string, progress: number): void {
+    const currentStatus = this.publishStatusSubject.value;
+    const existingIndex = currentStatus.findIndex(s => s.appId === appId);
+
+    if (existingIndex >= 0) {
+      currentStatus[existingIndex] = {
+        ...currentStatus[existingIndex],
+        progress,
+        message: `Публикация... ${progress}%`
+      };
+      this.publishStatusSubject.next([...currentStatus]);
+    }
+  }
+
+  private completePublishing(appId: string, status: 'success' | 'error', message?: string): void {
+    const currentStatus = this.publishStatusSubject.value;
+    const existingIndex = currentStatus.findIndex(s => s.appId === appId);
+
+    if (existingIndex >= 0) {
+      currentStatus[existingIndex] = {
+        appId,
+        status,
+        progress: 100,
+        message
+      };
+      this.publishStatusSubject.next([...currentStatus]);
+
+      setTimeout(() => {
+        this.clearPublishStatus(appId);
+      }, 3000);
+    }
+  }
+
+  clearPublishStatus(appId: string): void {
+    const currentStatus = this.publishStatusSubject.value;
+    const filteredStatus = currentStatus.filter(s => s.appId !== appId);
+    this.publishStatusSubject.next(filteredStatus);
   }
 }

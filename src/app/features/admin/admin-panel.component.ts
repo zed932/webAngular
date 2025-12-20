@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { AppService } from '../../core/services/app.service';
-import { AdminApp, AdminStats } from '../../shared/models/app.model';
+import { AdminApp, AdminStats, PublishStatus } from '../../shared/models/app.model';
 
 @Component({
   selector: 'app-admin-panel',
@@ -28,6 +28,7 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
   isEditing = false;
   isAdding = false;
   isLoading = false;
+  publishStatuses: PublishStatus[] = [];
 
   newApp: Partial<AdminApp> = {
     name: '',
@@ -47,6 +48,12 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.loadData();
+
+    this.appService.publishStatus$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(statuses => {
+        this.publishStatuses = statuses;
+      });
   }
 
   loadData() {
@@ -61,7 +68,6 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
       },
       error: () => {
         this.isLoading = false;
-        // Здесь можно добавить обработку ошибки
       }
     });
 
@@ -72,15 +78,33 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
     });
   }
 
+  getPublishStatus(appId: string): PublishStatus | undefined {
+    return this.publishStatuses.find(s => s.appId === appId);
+  }
+
   togglePublish(app: AdminApp) {
-    this.appService.toggleAppPublish(app.id).pipe(
+    if (this.getPublishStatus(app._id)?.status === 'publishing') {
+      return;
+    }
+
+    this.appService.toggleAppPublish(app._id).pipe(
       takeUntil(this.destroy$)
-    ).subscribe(updatedApp => {
-      if (updatedApp) {
-        app.isPublished = updatedApp.isPublished;
-        this.loadStats();
-      }
+    ).subscribe({
+      next: (updatedApp) => {
+        if (updatedApp) {
+          const index = this.apps.findIndex(a => a._id === updatedApp._id);
+          if (index !== -1) {
+            this.apps[index] = updatedApp;
+          }
+          this.loadStats();
+        }
+      },
+      error: () => {}
     });
+  }
+
+  closeProgress(appId: string): void {
+    this.appService.clearPublishStatus(appId);
   }
 
   editApp(app: AdminApp) {
@@ -92,20 +116,18 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
 
   saveApp() {
     if (this.selectedApp) {
-      this.appService.updateApp(this.selectedApp.id, this.selectedApp).pipe(
+      this.appService.updateApp(this.selectedApp._id, this.selectedApp).pipe(
         takeUntil(this.destroy$)
       ).subscribe({
         next: (updatedApp) => {
-          const index = this.apps.findIndex(a => a.id === updatedApp.id);
+          const index = this.apps.findIndex(a => a._id === updatedApp._id);
           if (index !== -1) {
             this.apps[index] = updatedApp;
           }
           this.cancelEdit();
           this.loadStats();
         },
-        error: () => {
-          // Обработка ошибки обновления
-        }
+        error: () => {}
       });
     }
   }
@@ -141,7 +163,7 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
   }
 
   saveNewApp() {
-    this.appService.addApp(this.newApp as Omit<AdminApp, 'id'>).pipe(
+    this.appService.addApp(this.newApp as Omit<AdminApp, '_id'>).pipe(
       takeUntil(this.destroy$)
     ).subscribe({
       next: (newApp) => {
@@ -149,9 +171,7 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
         this.cancelAdd();
         this.loadStats();
       },
-      error: () => {
-        // Обработка ошибки добавления
-      }
+      error: () => {}
     });
   }
 
@@ -171,20 +191,16 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
     };
   }
 
-  deleteApp(appId: number) {
+  deleteApp(appId: string) {
     if (confirm('Вы уверены, что хотите удалить это приложение?')) {
       this.appService.deleteApp(appId).pipe(
         takeUntil(this.destroy$)
       ).subscribe({
-        next: (success) => {
-          if (success) {
-            this.apps = this.apps.filter(app => app.id !== appId);
-            this.loadStats();
-          }
+        next: () => {
+          this.apps = this.apps.filter(app => app._id !== appId);
+          this.loadStats();
         },
-        error: () => {
-          // Обработка ошибки удаления
-        }
+        error: () => {}
       });
     }
   }

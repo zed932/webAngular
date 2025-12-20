@@ -1,0 +1,263 @@
+.publish-progress-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.publish-progress-container {
+  width: 100%;
+  max-width: 400px;
+  padding: 25px;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.progress-header h4 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--c-content);
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--c-content);
+  opacity: 0.7;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+  opacity: 1;
+  background: color-mix(in srgb, var(--c-content) 10%, transparent);
+}
+
+.progress-message {
+  margin-bottom: 20px;
+  color: color-mix(in srgb, var(--c-content) 80%, transparent);
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.progress-bar-container {
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.progress-bar {
+  height: 8px;
+  background: color-mix(in srgb, var(--c-glass) 50%, transparent);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    var(--c-action) 0%,
+    #34C759 100%
+  );
+  border-radius: 4px;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 20px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  animation: shimmer 1.5s infinite;
+}
+
+.progress-text {
+  position: absolute;
+  right: 0;
+  top: -25px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--c-action);
+}
+
+.progress-status-icon {
+  display: flex;
+  justify-content: center;
+  font-size: 2rem;
+  margin-top: 10px;
+}
+
+.progress-status-icon .success {
+  color: #34C759;
+  animation: bounceIn 0.5s;
+}
+
+.progress-status-icon .error {
+  color: #FF3B30;
+  animation: shake 0.5s;
+}
+
+/* Анимации */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(400%);
+  }
+}
+
+@keyframes bounceIn {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-5px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(5px);
+  }
+}
+
+/* Адаптив для прогресс-бара */
+@media (max-width: 480px) {
+  .publish-progress-overlay {
+    padding: 15px;
+  }
+
+  .publish-progress-container {
+    padding: 20px;
+    border-radius: 16px;
+  }
+
+  .progress-header h4 {
+    font-size: 1.1rem;
+  }
+
+  .progress-message {
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+  }
+
+  .progress-bar {
+    height: 6px;
+  }
+
+  .progress-text {
+    font-size: 0.85rem;
+    top: -20px;
+  }
+
+  .progress-status-icon {
+    font-size: 1.5rem;
+  }
+
+  .close-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 340px) {
+  .publish-progress-container {
+    padding: 16px;
+  }
+
+  .progress-header h4 {
+    font-size: 1rem;
+  }
+
+  .progress-message {
+    font-size: 0.85rem;
+  }
+}
+
+/* Для ландшафтной ориентации */
+@media (max-height: 600px) and (orientation: landscape) {
+  .publish-progress-overlay {
+    padding: 10px;
+  }
+
+  .publish-progress-container {
+    max-width: 300px;
+    padding: 15px;
+  }
+
+  .progress-header {
+    margin-bottom: 10px;
+  }
+
+  .progress-message {
+    margin-bottom: 10px;
+  }
+}
+
+/* Поддержка prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .progress-fill {
+    transition: none;
+  }
+
+  .progress-fill::after,
+  .progress-status-icon .success,
+  .progress-status-icon .error {
+    animation: none;
+  }
+}
+
+/* Touch-устройства */
+@media (hover: none) and (pointer: coarse) {
+  .close-btn {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}

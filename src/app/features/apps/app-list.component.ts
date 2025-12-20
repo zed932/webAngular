@@ -15,7 +15,7 @@ export class AppListComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   apps: App[] = [];
-  expandedAppId: number | null = null;
+  expandedAppId: string | null = null;
 
   constructor(private appService: AppService) {}
 
@@ -27,11 +27,11 @@ export class AppListComponent implements OnInit, OnDestroy {
     });
   }
 
-  toggleAppDetails(appId: number) {
+  toggleAppDetails(appId: string) {
     this.expandedAppId = this.expandedAppId === appId ? null : appId;
   }
 
-  isExpanded(appId: number): boolean {
+  isExpanded(appId: string): boolean {
     return this.expandedAppId === appId;
   }
 

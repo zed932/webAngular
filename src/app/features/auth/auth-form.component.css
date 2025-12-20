@@ -98,3 +98,290 @@
     padding: 30px 20px;
   }
 }
+/* Добавить эти стили к существующим */
+
+.field-error {
+  color: #ff6b6b;
+  font-size: 0.85rem;
+  margin-top: 4px;
+  backdrop-filter: blur(5px);
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: color-mix(in srgb, #ff0000 10%, transparent);
+}
+
+.glass-input.error {
+  border-color: #ff6b6b;
+  background: color-mix(in srgb, #ff0000 5%, transparent);
+}
+
+.glass-input.error:focus {
+  border-color: #ff6b6b;
+  box-shadow: 0 0 0 2px color-mix(in srgb, #ff0000 30%, transparent);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.loading-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.loading-spinner::after {
+  content: '';
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Добавить медиа запрос для улучшения отображения на мобильных */
+@media (max-width: 480px) {
+  .field-error {
+    font-size: 0.8rem;
+  }
+
+  .auth-form {
+    gap: 15px;
+  }
+}
+/* Медиа-запросы для адаптивности */
+
+/* Для очень маленьких экранов (340px - 480px) */
+@media (max-width: 480px) {
+  .auth-container {
+    padding: 10px;
+  }
+
+  .auth-card {
+    padding: 25px 15px;
+    border-radius: 8px;
+  }
+
+  .auth-card h2 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+  }
+
+  .auth-form {
+    gap: 15px;
+  }
+
+  .form-group label {
+    font-size: 0.95rem;
+  }
+
+  .glass-input {
+    padding: 10px 12px;
+    font-size: 0.95rem;
+    border-radius: 8px;
+  }
+
+  .glass-button {
+    padding: 12px;
+    font-size: 1rem;
+  }
+
+  .auth-switch {
+    margin-top: 15px;
+    padding-top: 15px;
+    font-size: 0.9rem;
+  }
+
+  .back-link .glass-button {
+    padding: 10px 15px;
+    font-size: 0.9rem;
+  }
+
+  .field-error {
+    font-size: 0.8rem;
+    padding: 3px 6px;
+  }
+}
+
+/* Для экстремально маленьких экранов (340px и меньше) */
+@media (max-width: 340px) {
+  .auth-card {
+    padding: 20px 12px;
+  }
+
+  .auth-card h2 {
+    font-size: 1.3rem;
+  }
+
+  .glass-input {
+    padding: 8px 10px;
+    font-size: 0.9rem;
+  }
+
+  .glass-button {
+    padding: 10px;
+    font-size: 0.95rem;
+  }
+
+  .auth-switch p {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: center;
+  }
+}
+
+/* Для планшетов и маленьких десктопов (481px - 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+  .auth-card {
+    max-width: 350px;
+    padding: 35px;
+  }
+
+  .auth-card h2 {
+    font-size: 1.6rem;
+  }
+}
+
+/* Для средних десктопов (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .auth-card {
+    max-width: 380px;
+  }
+}
+
+/* Для больших экранов (1025px - 1400px) */
+@media (min-width: 1025px) and (max-width: 1400px) {
+  .auth-container {
+    padding: 40px;
+  }
+
+  .auth-card {
+    max-width: 420px;
+    padding: 50px;
+  }
+
+  .auth-card h2 {
+    font-size: 2rem;
+    margin-bottom: 35px;
+  }
+
+  .auth-form {
+    gap: 25px;
+  }
+
+  .glass-input {
+    padding: 14px 18px;
+    font-size: 1.05rem;
+  }
+}
+
+/* Для очень больших экранов (1400px и более) */
+@media (min-width: 1401px) {
+  .auth-container {
+    padding: 60px;
+  }
+
+  .auth-card {
+    max-width: 450px;
+    padding: 60px;
+    border-radius: 16px;
+  }
+
+  .auth-card h2 {
+    font-size: 2.2rem;
+    margin-bottom: 40px;
+  }
+
+  .auth-form {
+    gap: 30px;
+  }
+
+  .form-group {
+    gap: 12px;
+  }
+
+  .form-group label {
+    font-size: 1.1rem;
+  }
+
+  .glass-input {
+    padding: 16px 20px;
+    font-size: 1.1rem;
+    border-radius: 12px;
+  }
+
+  .glass-button {
+    padding: 16px;
+    font-size: 1.1rem;
+    border-radius: 12px;
+  }
+
+  .error-message {
+    padding: 15px 20px;
+    font-size: 1.05rem;
+  }
+
+  .field-error {
+    font-size: 0.95rem;
+    padding: 6px 10px;
+  }
+}
+
+/* Адаптация для landscape режима на мобильных */
+@media (max-height: 600px) and (orientation: landscape) {
+  .auth-container {
+    padding: 10px;
+    min-height: auto;
+  }
+
+  .auth-card {
+    padding: 20px;
+    margin: 10px 0;
+  }
+
+  .auth-form {
+    gap: 12px;
+  }
+
+  .form-group {
+    gap: 4px;
+  }
+
+  .glass-input {
+    padding: 8px 12px;
+  }
+}
+
+/* Поддержка prefers-reduced-motion для доступности */
+@media (prefers-reduced-motion: reduce) {
+  .loading-spinner::after {
+    animation: none;
+  }
+
+  .glass-input,
+  .glass-button {
+    transition: none;
+  }
+}
+
+/* Поддержка темной темы на системном уровне */
+@media (prefers-color-scheme: dark) {
+  .auth-card {
+    --glass-reflex-light: 0.5;
+    --glass-reflex-dark: 0.7;
+  }
+
+  .glass-input {
+    background: color-mix(in srgb, var(--c-glass) 15%, transparent);
+  }
+}

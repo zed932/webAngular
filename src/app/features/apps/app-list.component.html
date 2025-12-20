@@ -8,9 +8,9 @@
     <div
       *ngFor="let app of apps"
       class="app-item glass-effect"
-      [class.expanded]="isExpanded(app.id)">
+      [class.expanded]="isExpanded(app._id)">
 
-      <div class="app-header" (click)="toggleAppDetails(app.id)">
+      <div class="app-header" (click)="toggleAppDetails(app._id)">
         <div class="app-basic-info">
           <span class="app-icon">{{ app.icon }}</span>
           <div class="app-title">
@@ -20,12 +20,12 @@
         </div>
         <div class="app-actions">
           <span class="expand-icon">
-            {{ isExpanded(app.id) ? '▼' : '▶' }}
+            {{ isExpanded(app._id) ? '▼' : '▶' }}
           </span>
         </div>
       </div>
 
-      <div *ngIf="isExpanded(app.id)" class="app-details">
+      <div *ngIf="isExpanded(app._id)" class="app-details">
         <div class="detail-section">
           <h4>📱 Описание</h4>
           <p>{{ app.description }}</p>

@@ -1,15 +1,17 @@
 <div class="app-wrapper">
-  <!-- Общая навигация для всех страниц -->
+
   <header class="main-header">
     <nav class="header-nav glass-effect">
       <a routerLink="/" class="nav-brand">iOS Portfolio</a>
       <div class="nav-actions">
-        <a routerLink="/" class="nav-link">Главная</a>
-        <a routerLink="/tester" class="nav-link" *ngIf="authService.isAuthenticated()">Тестирование</a>
-        <a routerLink="/admin" class="nav-link" *ngIf="authService.isAuthenticated()">Админ-панель</a>
         <span class="user-email" *ngIf="authService.isAuthenticated()">
           {{ (authService.currentUser$ | async)?.email }}
         </span>
+        <div class="nav-links-group">
+          <a routerLink="/" class="nav-link">Главная</a>
+          <a routerLink="/tester" class="nav-link" *ngIf="authService.isAuthenticated()">Тестирование</a>
+          <a routerLink="/admin" class="nav-link" *ngIf="authService.isAuthenticated()">Админ-панель</a>
+        </div>
         <button
           *ngIf="authService.isAuthenticated()"
           (click)="authService.logout()"

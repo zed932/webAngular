@@ -2,7 +2,7 @@
   <div class="auth-card glass-effect">
     <h2>{{ isLoginMode ? 'Вход для тестировщиков' : 'Стать тестировщиком' }}</h2>
 
-    <form (ngSubmit)="onSubmit()" class="auth-form">
+    <form (ngSubmit)="onSubmit()" class="auth-form" #authForm="ngForm">
       <div class="form-group">
         <label>Email</label>
         <input
@@ -11,7 +11,12 @@
           name="email"
           placeholder="your@email.com"
           class="glass-input"
+          [class.error]="getErrorMessage('email')"
+          (input)="onInputChange('email')"
           required>
+        <div *ngIf="getErrorMessage('email')" class="field-error">
+          {{ getErrorMessage('email') }}
+        </div>
       </div>
 
       <div class="form-group">
@@ -22,15 +27,45 @@
           name="password"
           placeholder="Минимум 6 символов"
           class="glass-input"
+          [class.error]="getErrorMessage('password')"
+          (input)="onInputChange('password')"
           required>
+        <div *ngIf="getErrorMessage('password')" class="field-error">
+          {{ getErrorMessage('password') }}
+        </div>
+      </div>
+
+      <div *ngIf="!isLoginMode" class="form-group">
+        <label>Подтверждение пароля</label>
+        <input
+          type="password"
+          [(ngModel)]="confirmPassword"
+          name="confirmPassword"
+          placeholder="Повторите пароль"
+          class="glass-input"
+          [class.error]="getErrorMessage('confirmPassword')"
+          (input)="onInputChange('confirmPassword')"
+          required>
+        <div *ngIf="getErrorMessage('confirmPassword')" class="field-error">
+          {{ getErrorMessage('confirmPassword') }}
+        </div>
       </div>
 
       <div *ngIf="errorMessage" class="error-message">
         {{ errorMessage }}
       </div>
 
-      <button type="submit" class="glass-button full-width">
-        {{ isLoginMode ? 'Войти' : 'Зарегистрироваться' }}
+      <button
+        type="submit"
+        class="glass-button full-width"
+        [disabled]="isLoading">
+        <span *ngIf="!isLoading">
+          {{ isLoginMode ? 'Войти' : 'Зарегистрироваться' }}
+        </span>
+        <span *ngIf="isLoading" class="loading-spinner">
+          <!-- Можно добавить спиннер -->
+          Загрузка...
+        </span>
       </button>
     </form>
 

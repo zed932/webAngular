@@ -1,8 +1,19 @@
-// src/app/core/services/auth.service.ts
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { delay, map } from 'rxjs/operators';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { catchError, tap } from 'rxjs/operators';
 import { User } from '../../shared/models/app.model';
+
+interface AuthResponse {
+  message: string;
+  token: string;
+  user: User;
+}
+
+interface ValidationErrorResponse {
+  message: string;
+  errors: { [key: string]: string[] };
+}
 
 @Injectable({
   providedIn: 'root'
@@ -10,75 +21,74 @@ import { User } from '../../shared/models/app.model';
 export class AuthService {
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
+  private apiUrl = 'http://localhost:3000/api/auth';
 
-  // Тестовые пользователи с ролями
-  private testUsers = [
-    { email: 'admin@test.com', password: 'admin123', role: 'admin' as const },
-    { email: 'tester@test.com', password: 'test123', role: 'tester' as const },
-    { email: 'example1@mail.ru', password: 'qwerty123', role: 'tester' as const },
-    { email: 'example2@mail.ru', password: '12345678', role: 'tester' as const },
-    { email: 'example3@mail.ru', password: 'asdfgh123', role: 'tester' as const }
-  ];
-
-  constructor() {
+  constructor(private http: HttpClient) {
     const savedUser = localStorage.getItem('portfolio-user');
     if (savedUser) {
-      this.currentUserSubject.next(JSON.parse(savedUser));
+      try {
+        this.currentUserSubject.next(JSON.parse(savedUser));
+      } catch (error) {
+        console.error('Error parsing saved user:', error);
+        this.clearStorage();
+      }
     }
   }
 
-  login(email: string, password: string): Observable<boolean> {
-    return of(null).pipe(
-      delay(500),
-      map(() => {
-        const user = this.testUsers.find(u =>
-          u.email === email && u.password === password
-        );
+  private handleError(error: HttpErrorResponse) {
+    console.error('AuthService error:', error);
 
-        if (user) {
-          const userInfo: User = { email: user.email, role: user.role };
-          this.currentUserSubject.next(userInfo);
-          localStorage.setItem('portfolio-user', JSON.stringify(userInfo));
-          return true;
-        }
-        return false;
-      })
-    );
+    if (error.status === 0) {
+      // Client-side or network error
+      return throwError(() => new Error('Отсутствует подключение к интернету или сервер недоступен'));
+    }
+
+    // Server-side error
+    return throwError(() => error);
   }
 
-  register(email: string, password: string): Observable<boolean> {
-    return of(null).pipe(
-      delay(500),
-      map(() => {
-        const existingUser = this.testUsers.find(u => u.email === email);
+  login(email: string, password: string): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, { email, password })
+      .pipe(
+        tap(response => {
+          this.currentUserSubject.next(response.user);
+          localStorage.setItem('portfolio-user', JSON.stringify(response.user));
+          localStorage.setItem('portfolio-token', response.token);
+          console.log('Login successful, token saved:', response.token);
+        }),
+        catchError(this.handleError)
+      );
+  }
 
-        if (existingUser) {
-          if (existingUser.password === password) {
-            const userInfo: User = { email: existingUser.email, role: existingUser.role };
-            this.currentUserSubject.next(userInfo);
-            localStorage.setItem('portfolio-user', JSON.stringify(userInfo));
-            return true;
-          }
-          return false;
-        } else {
-          // Новые пользователи по умолчанию становятся тестировщиками
-          const newUser: User = { email, role: 'tester' };
-          this.currentUserSubject.next(newUser);
-          localStorage.setItem('portfolio-user', JSON.stringify(newUser));
-          this.testUsers.push({ email, password, role: 'tester' });
-          return true;
-        }
-      })
-    );
+  register(email: string, password: string): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/register`, { email, password })
+      .pipe(
+        tap(response => {
+          this.currentUserSubject.next(response.user);
+          localStorage.setItem('portfolio-user', JSON.stringify(response.user));
+          localStorage.setItem('portfolio-token', response.token);
+          console.log('Registration successful, token saved:', response.token);
+        }),
+        catchError(this.handleError)
+      );
   }
 
   logout(): void {
     this.currentUserSubject.next(null);
+    this.clearStorage();
+    console.log('Logged out, tokens cleared');
+  }
+
+  private clearStorage(): void {
     localStorage.removeItem('portfolio-user');
+    localStorage.removeItem('portfolio-token');
   }
 
   isAuthenticated(): boolean {
-    return this.currentUserSubject.value !== null;
+    // Проверяем наличие токена и пользователя
+    const token = localStorage.getItem('portfolio-token');
+    const user = this.currentUserSubject.value;
+    return !!token && !!user;
   }
 
   getCurrentUser(): User | null {
@@ -97,5 +107,10 @@ export class AuthService {
 
   isGuest(): boolean {
     return !this.isAuthenticated();
+  }
+
+  getToken(): string | null {
+    const token = localStorage.getItem('portfolio-token');
+    return token;
   }
 }

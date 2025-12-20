@@ -106,7 +106,24 @@
 
   <!-- Список приложений -->
   <div class="apps-list">
-    <div *ngFor="let app of apps" class="app-card glass-effect">
+    <div *ngFor="let app of apps" class="app-card glass-effect" [class.publishing]="getPublishStatus(app._id)">
+
+      <!-- Прогресс-бар публикации -->
+      <div *ngIf="getPublishStatus(app._id)" class="publish-progress-container">
+        <div class="publish-progress-info">
+          <span class="publish-message">{{ getPublishStatus(app._id)?.message }}</span>
+          <span class="publish-percentage">{{ getPublishStatus(app._id)?.progress }}%</span>
+        </div>
+        <div class="publish-progress-bar">
+          <div class="progress-fill" [style.width.%]="getPublishStatus(app._id)?.progress || 0"></div>
+        </div>
+        <div class="publish-status-icon">
+          <span *ngIf="getPublishStatus(app._id)?.status === 'publishing'">🔄</span>
+          <span *ngIf="getPublishStatus(app._id)?.status === 'success'" class="success">✅</span>
+          <span *ngIf="getPublishStatus(app._id)?.status === 'error'" class="error">❌</span>
+        </div>
+      </div>
+
       <div class="app-header">
         <div class="app-icon">{{ app.icon }}</div>
         <div class="app-info">
@@ -132,13 +149,22 @@
       </div>
 
       <div class="app-actions">
-        <button class="glass-button small" (click)="togglePublish(app)">
+        <button class="glass-button small"
+                (click)="togglePublish(app)"
+                [disabled]="getPublishStatus(app._id)?.status === 'publishing'">
           {{ app.isPublished ? 'Снять с публикации' : 'Опубликовать' }}
         </button>
-        <button class="glass-button small" (click)="editApp(app)">Редактировать</button>
-        <button class="glass-button small danger" (click)="deleteApp(app.id)">Удалить</button>
+        <button class="glass-button small"
+                (click)="editApp(app)"
+                [disabled]="getPublishStatus(app._id)?.status === 'publishing'">
+          Редактировать
+        </button>
+        <button class="glass-button small danger"
+                (click)="deleteApp(app._id)"
+                [disabled]="getPublishStatus(app._id)?.status === 'publishing'">
+          Удалить
+        </button>
       </div>
     </div>
   </div>
 </div>
-

@@ -104,12 +104,192 @@
   flex-wrap: wrap;
 }
 
-@media (max-width: 768px) {
+/* Адаптив для списка приложений тестировщика */
+
+/* Для очень маленьких экранов (340px - 480px) */
+@media (max-width: 480px) {
   .app-list-container {
-    padding: 10px;
+    padding: 12px;
+    max-width: 100%;
   }
 
-  .action-buttons {
+  .tester-header {
+    padding: 25px 20px;
+    margin-bottom: 20px;
+    border-radius: 16px;
+  }
+
+  .tester-header h1 {
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+  }
+
+  .tester-header p {
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  .apps-list {
+    gap: 12px;
+  }
+
+  .app-item {
+    padding: 16px;
+    border-radius: 16px;
+  }
+
+  .app-header {
     flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .app-basic-info {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .app-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+  }
+
+  .app-title {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .app-title h3 {
+    font-size: 1.1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .app-version {
+    font-size: 0.8rem;
+  }
+
+  .expand-icon {
+    align-self: flex-end;
+    font-size: 0.9rem;
+  }
+
+  .app-details {
+    margin-top: 15px;
+    padding-top: 15px;
+  }
+
+  .detail-section {
+    margin-bottom: 15px;
+  }
+
+  .detail-section h4 {
+    font-size: 0.95rem;
+    margin-bottom: 8px;
+  }
+
+  .detail-section p {
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
+
+  .tech-stack {
+    gap: 6px;
+  }
+
+  .tech-tag {
+    padding: 4px 8px;
+    font-size: 0.7rem;
+    border-radius: 12px;
+  }
+
+  .requirements p {
+    font-size: 0.85rem;
+  }
+}
+
+/* Для экстремально маленьких экранов (340px и меньше) */
+@media (max-width: 340px) {
+  .tester-header {
+    padding: 20px 16px;
+  }
+
+  .tester-header h1 {
+    font-size: 1.3rem;
+  }
+
+  .app-item {
+    padding: 12px;
+  }
+
+  .app-title h3 {
+    font-size: 1rem;
+  }
+
+  .app-icon {
+    font-size: 1.3rem;
+  }
+}
+
+/* Для планшетов (481px - 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+  .app-list-container {
+    padding: 16px;
+    max-width: 90%;
+  }
+
+  .tester-header {
+    padding: 30px 25px;
+  }
+
+  .tester-header h1 {
+    font-size: 2rem;
+  }
+
+  .app-item {
+    padding: 20px;
+  }
+
+  .app-title h3 {
+    font-size: 1.2rem;
+  }
+}
+
+/* Для ландшафтной ориентации на мобильных */
+@media (max-height: 600px) and (orientation: landscape) {
+  .app-list-container {
+    padding: 8px;
+  }
+
+  .tester-header {
+    padding: 15px;
+    margin-bottom: 15px;
+  }
+
+  .apps-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .app-item {
+    margin-bottom: 0;
+  }
+}
+
+/* Touch-устройства */
+@media (hover: none) and (pointer: coarse) {
+  .app-item:hover {
+    transform: none;
+  }
+
+  .app-header {
+    min-height: 44px;
+  }
+
+  .tech-tag {
+    min-height: 32px;
+    min-width: 32px;
   }
 }
