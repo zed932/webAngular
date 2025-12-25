@@ -25,31 +25,49 @@ export class AppService {
     return this.http.get<AdminApp[]>(`${this.apiUrl}/admin/apps`);
   }
 
-  toggleAppPublish(appId: string): Observable<AdminApp> {
-    this.startPublishing(appId);
+  toggleAppPublish(appId: string, currentStatus: boolean): Observable<AdminApp> {
+    // Показываем прогресс только при публикации (когда currentStatus = false)
+    if (!currentStatus) {
+      this.startPublishing(appId);
+    }
 
     return new Observable<AdminApp>(observer => {
-      let progress = 0;
-      const interval = setInterval(() => {
-        progress += 10;
-        this.updatePublishProgress(appId, progress);
+      if (!currentStatus) {
+        // Только при публикации показываем прогресс
+        let progress = 0;
+        const interval = setInterval(() => {
+          progress += 10;
+          this.updatePublishProgress(appId, progress);
 
-        if (progress >= 100) {
-          clearInterval(interval);
-          this.http.patch<AdminApp>(`${this.apiUrl}/admin/apps/${appId}/publish`, {})
-            .subscribe({
-              next: (app) => {
-                this.completePublishing(appId, 'success', 'Приложение успешно опубликовано!');
-                observer.next(app);
-                observer.complete();
-              },
-              error: (error) => {
-                this.completePublishing(appId, 'error', 'Ошибка при публикации');
-                observer.error(error);
-              }
-            });
-        }
-      }, 200);
+          if (progress >= 100) {
+            clearInterval(interval);
+            this.http.patch<AdminApp>(`${this.apiUrl}/admin/apps/${appId}/publish`, {})
+              .subscribe({
+                next: (app) => {
+                  this.completePublishing(appId, 'success', 'Приложение успешно опубликовано!');
+                  observer.next(app);
+                  observer.complete();
+                },
+                error: (error) => {
+                  this.completePublishing(appId, 'error', 'Ошибка при публикации');
+                  observer.error(error);
+                }
+              });
+          }
+        }, 200);
+      } else {
+        // При снятии с публикации делаем запрос сразу без прогресса
+        this.http.patch<AdminApp>(`${this.apiUrl}/admin/apps/${appId}/publish`, {})
+          .subscribe({
+            next: (app) => {
+              observer.next(app);
+              observer.complete();
+            },
+            error: (error) => {
+              observer.error(error);
+            }
+          });
+      }
     });
   }
 

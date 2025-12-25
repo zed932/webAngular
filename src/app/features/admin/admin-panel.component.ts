@@ -87,7 +87,7 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.appService.toggleAppPublish(app._id).pipe(
+    this.appService.toggleAppPublish(app._id, app.isPublished).pipe(
       takeUntil(this.destroy$)
     ).subscribe({
       next: (updatedApp) => {
@@ -116,7 +116,21 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
 
   saveApp() {
     if (this.selectedApp) {
-      this.appService.updateApp(this.selectedApp._id, this.selectedApp).pipe(
+      // Создаем копию объекта без лишних полей
+      const updateData = {
+        name: this.selectedApp.name,
+        version: this.selectedApp.version,
+        techStack: this.selectedApp.techStack,
+        minIOSVersion: this.selectedApp.minIOSVersion,
+        supportsMacOS: this.selectedApp.supportsMacOS,
+        description: this.selectedApp.description,
+        icon: this.selectedApp.icon,
+        isPublished: this.selectedApp.isPublished,
+        downloadCount: this.selectedApp.downloadCount,
+        rating: this.selectedApp.rating
+      };
+
+      this.appService.updateApp(this.selectedApp._id, updateData).pipe(
         takeUntil(this.destroy$)
       ).subscribe({
         next: (updatedApp) => {
@@ -127,15 +141,29 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
           this.cancelEdit();
           this.loadStats();
         },
-        error: () => {}
+        error: (error) => {
+          console.error('Error updating app:', error);
+        }
       });
     }
   }
 
+// Аналогично для addTechStackItem, добавим проверку
   addTechStackItem() {
-    if (this.newTechStackItem.trim() && this.selectedApp) {
-      this.selectedApp.techStack.push(this.newTechStackItem.trim());
-      this.newTechStackItem = '';
+    if (this.newTechStackItem.trim()) {
+      if (this.selectedApp) {
+        if (!this.selectedApp.techStack) {
+          this.selectedApp.techStack = [];
+        }
+        this.selectedApp.techStack.push(this.newTechStackItem.trim());
+        this.newTechStackItem = '';
+      } else if (this.isAdding) {
+        if (!this.newApp.techStack) {
+          this.newApp.techStack = [];
+        }
+        this.newApp.techStack.push(this.newTechStackItem.trim());
+        this.newTechStackItem = '';
+      }
     }
   }
 
