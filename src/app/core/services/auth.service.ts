@@ -2,17 +2,21 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, tap } from 'rxjs/operators';
-import { User } from '../../shared/models/app.model';
 
 interface AuthResponse {
   message: string;
   token: string;
-  user: User;
+  user: {
+    _id: string;
+    email: string;
+    role: 'tester' | 'admin';
+  };
 }
 
-interface ValidationErrorResponse {
-  message: string;
-  errors: { [key: string]: string[] };
+interface User {
+  _id: string;
+  email: string;
+  role: 'tester' | 'admin';
 }
 
 @Injectable({
@@ -24,10 +28,15 @@ export class AuthService {
   private apiUrl = 'http://localhost:3000/api/auth';
 
   constructor(private http: HttpClient) {
+    this.loadUserFromStorage();
+  }
+
+  private loadUserFromStorage(): void {
     const savedUser = localStorage.getItem('portfolio-user');
     if (savedUser) {
       try {
-        this.currentUserSubject.next(JSON.parse(savedUser));
+        const user = JSON.parse(savedUser);
+        this.currentUserSubject.next(user);
       } catch (error) {
         console.error('Error parsing saved user:', error);
         this.clearStorage();
@@ -36,14 +45,23 @@ export class AuthService {
   }
 
   private handleError(error: HttpErrorResponse) {
-    console.error('AuthService error:', error);
+    console.error('AuthService error:', {
+      status: error.status,
+      statusText: error.statusText,
+      error: error.error,
+      url: error.url,
+      message: error.message
+    });
 
     if (error.status === 0) {
       // Client-side or network error
-      return throwError(() => new Error('Отсутствует подключение к интернету или сервер недоступен'));
+      return throwError(() => ({
+        status: 0,
+        message: 'Сервер недоступен. Проверьте подключение к интернету'
+      }));
     }
 
-    // Server-side error
+    // Return the error as is for component to handle
     return throwError(() => error);
   }
 
@@ -51,10 +69,7 @@ export class AuthService {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, { email, password })
       .pipe(
         tap(response => {
-          this.currentUserSubject.next(response.user);
-          localStorage.setItem('portfolio-user', JSON.stringify(response.user));
-          localStorage.setItem('portfolio-token', response.token);
-          console.log('Login successful, token saved:', response.token);
+          this.setUserAndToken(response.user, response.token);
         }),
         catchError(this.handleError)
       );
@@ -64,13 +79,18 @@ export class AuthService {
     return this.http.post<AuthResponse>(`${this.apiUrl}/register`, { email, password })
       .pipe(
         tap(response => {
-          this.currentUserSubject.next(response.user);
-          localStorage.setItem('portfolio-user', JSON.stringify(response.user));
-          localStorage.setItem('portfolio-token', response.token);
-          console.log('Registration successful, token saved:', response.token);
+          this.setUserAndToken(response.user, response.token);
         }),
         catchError(this.handleError)
       );
+  }
+
+  private setUserAndToken(user: User, token: string): void {
+    this.currentUserSubject.next(user);
+    localStorage.setItem('portfolio-user', JSON.stringify(user));
+    localStorage.setItem('portfolio-token', token);
+    console.log('User set:', user);
+    console.log('Token saved:', token.substring(0, 20) + '...');
   }
 
   logout(): void {
@@ -85,7 +105,6 @@ export class AuthService {
   }
 
   isAuthenticated(): boolean {
-    // Проверяем наличие токена и пользователя
     const token = localStorage.getItem('portfolio-token');
     const user = this.currentUserSubject.value;
     return !!token && !!user;
@@ -95,7 +114,6 @@ export class AuthService {
     return this.currentUserSubject.value;
   }
 
-  // Методы для проверки ролей
   isAdmin(): boolean {
     return this.currentUserSubject.value?.role === 'admin';
   }
@@ -105,12 +123,7 @@ export class AuthService {
     return role === 'tester' || role === 'admin';
   }
 
-  isGuest(): boolean {
-    return !this.isAuthenticated();
-  }
-
   getToken(): string | null {
-    const token = localStorage.getItem('portfolio-token');
-    return token;
+    return localStorage.getItem('portfolio-token');
   }
 }

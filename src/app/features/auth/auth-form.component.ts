@@ -9,8 +9,9 @@ interface AuthResponse {
   message: string;
   token: string;
   user: {
+    _id: string;
     email: string;
-    role: 'guest' | 'tester' | 'admin';
+    role: 'tester' | 'admin';
   };
 }
 
@@ -103,10 +104,13 @@ export class AuthFormComponent implements OnDestroy {
         const user = this.authService.getCurrentUser();
         console.log('Current user after auth:', user);
 
+        // Редирект в зависимости от роли
         if (user?.role === 'admin') {
           this.router.navigate(['/admin']);
-        } else {
+        } else if (user?.role === 'tester') {
           this.router.navigate(['/tester']);
+        } else {
+          this.router.navigate(['/']);
         }
       },
       error: (error) => {
@@ -120,7 +124,7 @@ export class AuthFormComponent implements OnDestroy {
         }
 
         // Проверка на таймаут или недоступность сервера
-        if (error.status === 0 || error.name === 'HttpErrorResponse') {
+        if (error.status === 0) {
           this.errorMessage = 'Сервер временно недоступен. Пожалуйста, попробуйте позже.';
           return;
         }
@@ -129,25 +133,32 @@ export class AuthFormComponent implements OnDestroy {
         if (error.status === 401) {
           this.errorMessage = 'Неверный email или пароль';
         } else if (error.status === 400) {
-          if (this.isLoginMode) {
-            this.errorMessage = 'Неверный email или пароль';
-          } else {
+          // Обработка ошибок от сервера
+          const serverMessage = error.error?.message || '';
+
+          if (serverMessage.includes('уже существует') ||
+            serverMessage.includes('already exists') ||
+            serverMessage.toLowerCase().includes('user already')) {
             this.errorMessage = 'Пользователь с таким email уже существует';
-          }
-        } else if (error.status === 422) {
-          // Обработка ошибок валидации с сервера
-          if (error.error?.errors) {
-            const serverErrors = error.error.errors;
-            if (serverErrors.email) {
-              this.validationErrors['email'] = serverErrors.email[0];
-            }
-            if (serverErrors.password) {
-              this.validationErrors['password'] = serverErrors.password[0];
+          } else if (serverMessage.includes('Ошибка валидации') ||
+            serverMessage.includes('Validation')) {
+            // Обработка валидационных ошибок
+            if (error.error?.error) {
+              const validationError = error.error.error;
+              if (validationError.includes('email')) {
+                this.validationErrors['email'] = 'Некорректный email адрес';
+              } else if (validationError.includes('password')) {
+                this.validationErrors['password'] = 'Пароль должен содержать минимум 6 символов';
+              } else {
+                this.errorMessage = validationError;
+              }
+            } else {
+              this.errorMessage = 'Ошибка валидации данных';
             }
           } else {
-            this.errorMessage = error.error?.message || 'Ошибка валидации данных';
+            this.errorMessage = serverMessage || 'Ошибка при обработке запроса';
           }
-        } else if (error.status >= 500) {
+        } else if (error.status === 500) {
           this.errorMessage = 'Внутренняя ошибка сервера. Пожалуйста, попробуйте позже.';
         } else {
           this.errorMessage = error.error?.message || 'Произошла ошибка при авторизации';
