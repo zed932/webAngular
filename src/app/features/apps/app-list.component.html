@@ -5,47 +5,75 @@
   </header>
 
   <div class="apps-list">
-    <div
-      *ngFor="let app of apps"
-      class="app-item glass-effect"
-      [class.expanded]="isExpanded(app._id)">
+    @for (app of filteredApps(); track app.id) {
+      <div
+        class="app-item glass-effect"
+        [class.expanded]="isExpanded(app.id)">
 
-      <div class="app-header" (click)="toggleAppDetails(app._id)">
-        <div class="app-basic-info">
-          <span class="app-icon">{{ app.icon }}</span>
-          <div class="app-title">
-            <h3>{{ app.name }}</h3>
-            <span class="app-version">v{{ app.version }}</span>
+        <div class="app-header" (click)="toggleAppDetails(app.id)">
+          <div class="app-basic-info">
+            <span class="app-icon">{{ app.icon || '📱' }}</span>
+            <div class="app-title">
+              <h3>{{ app.name }}</h3>
+              <span class="app-version">v{{ app.version || '1.0.0' }}</span>
+            </div>
+          </div>
+          <div class="app-actions">
+            <span class="expand-icon">
+              {{ isExpanded(app.id) ? '▼' : '▶' }}
+            </span>
           </div>
         </div>
-        <div class="app-actions">
-          <span class="expand-icon">
-            {{ isExpanded(app._id) ? '▼' : '▶' }}
-          </span>
-        </div>
+
+        @if (isExpanded(app.id)) {
+          <div class="app-details">
+            <div class="detail-section">
+              <h4>📱 Описание</h4>
+              <p>{{ app.description }}</p>
+            </div>
+
+            <div class="detail-section">
+              <h4>🛠 Технологии</h4>
+              <div class="tech-stack">
+                @for (tech of (app.techStack || []); track tech) {
+                  <span class="tech-tag">{{ tech }}</span>
+                }
+              </div>
+            </div>
+
+            <div class="detail-section">
+              <h4>⚙️ Требования</h4>
+              <div class="requirements">
+                <p><strong>Минимальная версия iOS:</strong> {{ app.minIOSVersion || 'iOS 15.0' }}</p>
+                <p><strong>Поддержка macOS:</strong> {{ app.supportsMacOS ? '✅ Да' : '❌ Нет' }}</p>
+              </div>
+            </div>
+
+            <div class="detail-section">
+              <h4>📊 Статистика</h4>
+              <div class="app-stats">
+                <div class="stat-item">
+                  <span class="stat-label">Скачиваний:</span>
+                  <span class="stat-value">{{ app.downloadCount || 0 }}</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-label">Рейтинг:</span>
+                  <span class="stat-value">
+                    @for (star of [1,2,3,4,5]; track star) {
+                      <span class="star" [class.filled]="star <= (app.rating || 0)">★</span>
+                    }
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
       </div>
-
-      <div *ngIf="isExpanded(app._id)" class="app-details">
-        <div class="detail-section">
-          <h4>📱 Описание</h4>
-          <p>{{ app.description }}</p>
-        </div>
-
-        <div class="detail-section">
-          <h4>🛠 Технологии</h4>
-          <div class="tech-stack">
-            <span class="tech-tag" *ngFor="let tech of app.techStack">{{ tech }}</span>
-          </div>
-        </div>
-
-        <div class="detail-section">
-          <h4>⚙️ Требования</h4>
-          <div class="requirements">
-            <p><strong>Минимальная версия iOS:</strong> {{ app.minIOSVersion }}</p>
-            <p><strong>Поддержка macOS:</strong> {{ app.supportsMacOS ? '✅ Да' : '❌ Нет' }}</p>
-          </div>
-        </div>
+    }
+    @empty {
+      <div class="empty-state glass-effect">
+        <p>Приложения не найдены</p>
       </div>
-    </div>
+    }
   </div>
 </div>

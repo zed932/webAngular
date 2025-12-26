@@ -616,7 +616,7 @@
     animation: none;
   }
 
-  @keyframes none {
+  @keyframes "none" {
     0%, 100% { transform: none; }
   }
 }
@@ -1469,7 +1469,7 @@
     animation: none;
   }
 
-  @keyframes none {
+  @keyframes "none" {
     0%, 100% { transform: none; }
   }
 }

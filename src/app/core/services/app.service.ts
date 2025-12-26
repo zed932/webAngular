@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal, computed } from '@angular/core';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { App, AdminApp, AdminStats, PublishStatus } from '../../shared/models/app.model';
@@ -8,10 +8,30 @@ import { App, AdminApp, AdminStats, PublishStatus } from '../../shared/models/ap
 })
 export class AppService {
   private apiUrl = 'http://localhost:3000/api';
+
+  // Сигналы
+  private publishStatusSignal = signal<PublishStatus[]>([]);
+  private isLoadingSignal = signal<boolean>(false);
+
+  // BehaviorSubject для совместимости
   private publishStatusSubject = new BehaviorSubject<PublishStatus[]>([]);
   publishStatus$ = this.publishStatusSubject.asObservable();
 
-  constructor(private http: HttpClient) {}
+  // Readonly сигналы
+  public readonly publishStatus = this.publishStatusSignal.asReadonly();
+  public readonly isLoading = this.isLoadingSignal.asReadonly();
+
+  // Computed сигнал
+  public readonly activePublishingCount = computed(() =>
+    this.publishStatusSignal().filter(s => s.status === 'publishing').length
+  );
+
+  constructor(private http: HttpClient) {
+    // Синхронизируем сигнал с BehaviorSubject
+    this.publishStatus$.subscribe(status => {
+      this.publishStatusSignal.set(status);
+    });
+  }
 
   getApps(): Observable<App[]> {
     return this.http.get<App[]>(`${this.apiUrl}/apps`);
@@ -26,14 +46,14 @@ export class AppService {
   }
 
   toggleAppPublish(appId: string, currentStatus: boolean): Observable<AdminApp> {
-    // Показываем прогресс только при публикации (когда currentStatus = false)
+    this.isLoadingSignal.set(true);
+
     if (!currentStatus) {
       this.startPublishing(appId);
     }
 
     return new Observable<AdminApp>(observer => {
       if (!currentStatus) {
-        // Только при публикации показываем прогресс
         let progress = 0;
         const interval = setInterval(() => {
           progress += 10;
@@ -44,11 +64,13 @@ export class AppService {
             this.http.patch<AdminApp>(`${this.apiUrl}/admin/apps/${appId}/publish`, {})
               .subscribe({
                 next: (app) => {
+                  this.isLoadingSignal.set(false);
                   this.completePublishing(appId, 'success', 'Приложение успешно опубликовано!');
                   observer.next(app);
                   observer.complete();
                 },
                 error: (error) => {
+                  this.isLoadingSignal.set(false);
                   this.completePublishing(appId, 'error', 'Ошибка при публикации');
                   observer.error(error);
                 }
@@ -56,14 +78,15 @@ export class AppService {
           }
         }, 200);
       } else {
-        // При снятии с публикации делаем запрос сразу без прогресса
         this.http.patch<AdminApp>(`${this.apiUrl}/admin/apps/${appId}/publish`, {})
           .subscribe({
             next: (app) => {
+              this.isLoadingSignal.set(false);
               observer.next(app);
               observer.complete();
             },
             error: (error) => {
+              this.isLoadingSignal.set(false);
               observer.error(error);
             }
           });
@@ -91,23 +114,25 @@ export class AppService {
     const currentStatus = this.publishStatusSubject.value;
     const existingIndex = currentStatus.findIndex(s => s.appId === appId);
 
-    if (existingIndex >= 0) {
-      currentStatus[existingIndex] = {
+    const newStatus: PublishStatus[] = existingIndex >= 0
+      ? currentStatus.map((status, index) =>
+        index === existingIndex
+          ? {
+            appId,
+            status: 'publishing' as const,
+            progress: 0,
+            message: 'Начало публикации...'
+          }
+          : status
+      )
+      : [...currentStatus, {
         appId,
-        status: 'publishing',
+        status: 'publishing' as const,
         progress: 0,
         message: 'Начало публикации...'
-      };
-    } else {
-      currentStatus.push({
-        appId,
-        status: 'publishing',
-        progress: 0,
-        message: 'Начало публикации...'
-      });
-    }
+      }];
 
-    this.publishStatusSubject.next([...currentStatus]);
+    this.publishStatusSubject.next(newStatus);
   }
 
   private updatePublishProgress(appId: string, progress: number): void {
@@ -115,12 +140,13 @@ export class AppService {
     const existingIndex = currentStatus.findIndex(s => s.appId === appId);
 
     if (existingIndex >= 0) {
-      currentStatus[existingIndex] = {
-        ...currentStatus[existingIndex],
+      const newStatus = [...currentStatus];
+      newStatus[existingIndex] = {
+        ...newStatus[existingIndex],
         progress,
         message: `Публикация... ${progress}%`
       };
-      this.publishStatusSubject.next([...currentStatus]);
+      this.publishStatusSubject.next(newStatus);
     }
   }
 
@@ -129,13 +155,14 @@ export class AppService {
     const existingIndex = currentStatus.findIndex(s => s.appId === appId);
 
     if (existingIndex >= 0) {
-      currentStatus[existingIndex] = {
+      const newStatus = [...currentStatus];
+      newStatus[existingIndex] = {
         appId,
         status,
         progress: 100,
-        message
+        message: message || ''
       };
-      this.publishStatusSubject.next([...currentStatus]);
+      this.publishStatusSubject.next(newStatus);
 
       setTimeout(() => {
         this.clearPublishStatus(appId);

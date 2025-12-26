@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
@@ -14,6 +14,7 @@ import { AdminApp, AdminStats, PublishStatus } from '../../shared/models/app.mod
 })
 export class AdminPanelComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
+  private appService = inject(AppService);
 
   apps: AdminApp[] = [];
   stats: AdminStats = {
@@ -27,8 +28,14 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
   selectedApp: AdminApp | null = null;
   isEditing = false;
   isAdding = false;
-  isLoading = false;
-  publishStatuses: PublishStatus[] = [];
+
+  // Используем сигналы из сервиса
+  isLoading = this.appService.isLoading;
+  publishStatuses = this.appService.publishStatus;
+  activePublishingCount = this.appService.activePublishingCount;
+
+  // Локальный сигнал для поиска
+  searchTerm: string = '';
 
   newApp: Partial<AdminApp> = {
     name: '',
@@ -44,30 +51,40 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
   };
   newTechStackItem = '';
 
-  constructor(private appService: AppService) {}
+  constructor() {
+    // Эффект для отслеживания изменений статусов публикации
+    effect(() => {
+      const statuses = this.publishStatuses();
+      console.log('Статусы публикации обновлены (через сигнал):', statuses);
+    });
+
+    // Эффект для отслеживания состояния загрузки
+    effect(() => {
+      const loading = this.isLoading();
+      console.log('Состояние загрузки:', loading ? 'Загружается...' : 'Готово');
+    });
+  }
 
   ngOnInit() {
     this.loadData();
 
+    // Старая подписка через Observable (оставляем для совместимости)
     this.appService.publishStatus$
       .pipe(takeUntil(this.destroy$))
       .subscribe(statuses => {
-        this.publishStatuses = statuses;
+        console.log('Статусы публикации (через Observable):', statuses);
       });
   }
 
   loadData() {
-    this.isLoading = true;
-
     this.appService.getAdminApps().pipe(
       takeUntil(this.destroy$)
     ).subscribe({
       next: (apps) => {
         this.apps = apps;
-        this.isLoading = false;
       },
-      error: () => {
-        this.isLoading = false;
+      error: (error) => {
+        console.error('Ошибка загрузки приложений:', error);
       }
     });
 
@@ -79,7 +96,7 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
   }
 
   getPublishStatus(appId: string): PublishStatus | undefined {
-    return this.publishStatuses.find(s => s.appId === appId);
+    return this.publishStatuses().find(s => s.appId === appId);
   }
 
   togglePublish(app: AdminApp) {
@@ -99,7 +116,9 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
           this.loadStats();
         }
       },
-      error: () => {}
+      error: (error) => {
+        console.error('Ошибка публикации:', error);
+      }
     });
   }
 
@@ -116,7 +135,6 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
 
   saveApp() {
     if (this.selectedApp) {
-      // Создаем копию объекта без лишних полей
       const updateData = {
         name: this.selectedApp.name,
         version: this.selectedApp.version,
@@ -142,13 +160,12 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
           this.loadStats();
         },
         error: (error) => {
-          console.error('Error updating app:', error);
+          console.error('Ошибка обновления приложения:', error);
         }
       });
     }
   }
 
-// Аналогично для addTechStackItem, добавим проверку
   addTechStackItem() {
     if (this.newTechStackItem.trim()) {
       if (this.selectedApp) {
@@ -199,7 +216,9 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
         this.cancelAdd();
         this.loadStats();
       },
-      error: () => {}
+      error: (error) => {
+        console.error('Ошибка добавления приложения:', error);
+      }
     });
   }
 
@@ -228,7 +247,9 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
           this.apps = this.apps.filter(app => app._id !== appId);
           this.loadStats();
         },
-        error: () => {}
+        error: (error) => {
+          console.error('Ошибка удаления приложения:', error);
+        }
       });
     }
   }
